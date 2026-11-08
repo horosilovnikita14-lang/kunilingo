@@ -1,0 +1,139 @@
+/* The Path grows into a reading workspace; room and navigation stay in place. */
+#room.vellum-study[data-section=path] .study-panel {
+  top: max(24px, env(safe-area-inset-top));
+  right: max(clamp(20px, 2.5vw, 48px), env(safe-area-inset-right));
+  width: min(1050px, calc(100% - var(--nav-w) - 96px)); max-width: none;
+  max-height: calc(100% - 104px); padding: 0 24px 0;
+  background: var(--grain), #f1e6d0; border-width: 1.5px;
+  border-radius: 12px; color: var(--vellum-ink);
+}
+#room.vellum-study[data-section=path] .study-panel-header {
+  min-height: 48px; padding: 8px 0 0; border: 0;
+}
+#room.vellum-study[data-section=path] .study-subject { font: 12px/1.4 var(--ui-font); color: #6a6559; letter-spacing: .015em; }
+#room.vellum-study[data-section=path] .study-close { margin-right: -8px; }
+#room.vellum-study[data-section=path] .study-panel h1 {
+  margin: 3px 0 0; padding: 0; background: none; font: 500 clamp(32px, 3.3vw, 46px)/1.14 var(--vellum-serif); letter-spacing: -.035em;
+}
+#room.vellum-study[data-section=path] .study-body {
+  margin: 0; padding: 0; border: 0; border-radius: 0; background: none;
+  font: 14px/1.55 var(--ui-font); color: #3d423c;
+}
+#room.vellum-study .path-intro { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 8px 0 23px; }
+#room.vellum-study .path-intro p { margin: 0; font: 14px/1.5 var(--ui-font); color: #70695c; }
+.path-total { width: 140px; flex-shrink: 0; font: 11px/1.4 var(--ui-font); color: #70695c; }
+.path-total strong { color: #4f5a42; font-weight: 650; }
+.path-total-track { height: 4px; background: #d8cdb7; margin-top: 7px; border-radius: 3px; overflow: hidden; }
+.path-total-track i { display: block; height: 100%; background: #67714e; border-radius: inherit; transition: width .2s ease; }
+.path-layout { display: grid; grid-template-columns: minmax(215px, .85fr) minmax(0, 1.35fr); border-top: 1px solid #cfc1a5; min-height: 375px; }
+.path-route { min-width: 0; padding: 20px 22px 12px 0; border-right: 1px solid #d3c6ad; }
+.path-route-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.path-route-heading > span:last-child { font-size: 11px; color: #827767; }
+.path-kicker { display: block; font: 550 10px/1.5 var(--ui-font); letter-spacing: .1em; color: #8c593c; }
+.path-filters { display: flex; gap: 4px; margin: 14px 0 13px; flex-wrap: wrap; }
+.path-filters button { padding: 5px 9px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: #726c60; font: 11px/1.4 var(--ui-font); cursor: pointer; }
+.path-filters button[aria-pressed=true] { border-color: #bdb397; background: #e4dcc6; color: #494f3f; }
+.path-filters button:hover { background: #e6dcc6; }
+.path-topic-list { list-style: none; padding: 0; margin: 0; }
+.path-topic-list li { position: relative; }
+.path-topic-list li:not(:last-child)::before { content: ''; position: absolute; width: 1px; background: #c9bea5; left: 25px; top: 43px; bottom: -15px; }
+.path-topic { position: relative; width: 100%; display: flex; gap: 12px; align-items: center; padding: 11px 10px; margin: 3px 0; border: 1px solid transparent; border-radius: 8px; color: #4e5349; background: transparent; text-align: left; cursor: pointer; transition: background-color .15s ease, border-color .15s ease; }
+.path-topic:hover { background: #e5dbc5; }
+.path-topic.is-selected { border-color: #b7b397; background: #e4dfc9; }
+.path-node { position: relative; flex: none; width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #b7b097; border-radius: 50%; background: #f1e6d0; font: 500 11px/1 var(--ui-font); color: #827a69; }
+.path-topic.is-selected .path-node, .path-topic.is-complete .path-node { background: #596348; border-color: #596348; color: #faf3df; }
+.path-node svg { width: 16px; height: 16px; }
+.path-topic-copy { flex: 1; min-width: 0; }
+.path-topic-copy strong { display: block; font: 550 13px/1.35 var(--ui-font); }
+.path-topic-copy small { display: block; margin-top: 4px; font: 11px/1.4 var(--ui-font); color: #827767; }
+.path-topic-arrow { width: 15px; height: 15px; flex: none; color: #69704e; }
+.path-route-note { display: flex; gap: 8px; align-items: flex-start; margin: 16px 9px 0; color: #8a806e; }
+.path-route-note svg { width: 14px; height: 14px; flex: none; margin-top: 2px; }
+#room.vellum-study .path-route-note p { margin: 0; font: 11px/1.5 var(--ui-font); color: inherit; }
+.path-detail { min-width: 0; padding: 22px 0 20px 30px; display: flex; flex-direction: column; align-items: flex-start; }
+.path-detail > * { max-width: 100%; }
+.path-topic-heading { width: 100%; min-width: 0; }
+#room.vellum-study .path-detail h2 { margin: 9px 0 11px; font: 500 clamp(25px, 2.3vw, 34px)/1.13 var(--vellum-serif); letter-spacing: -.02em; text-wrap: balance; color: #363d34; }
+#room.vellum-study .path-detail p { color: #70695b; font: 13px/1.65 var(--ui-font); margin: 0; }
+.path-steps { list-style: none; margin: 15px 0 10px; padding: 0; width: 100%; }
+.path-steps li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #d7ccb5; }
+.path-steps li:last-child { border: 0; }
+.path-step-icon { width: 30px; height: 32px; flex: none; display: grid; place-items: center; color: #8e6746; }
+.path-step-icon svg { width: 23px; height: 23px; }
+.path-step-icon.is-done { color: #64724f; }
+.path-steps strong { display: block; font: 550 13px/1.4 var(--ui-font); }
+.path-steps small { display: block; margin-top: 3px; font: 11px/1.5 var(--ui-font); color: #8a7c68; }
+.path-step-done { margin-left: auto; font: 10px/1.4 var(--ui-font); color: #64724f; }
+.path-detail-bottom { margin-top: auto; width: 100%; padding-top: 16px; }
+.path-duration { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; color: #8a7b66; font: 11px/1.4 var(--ui-font); }
+.path-duration svg { width: 14px; height: 14px; }
+.path-primary { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 16px; border: 1px solid #934726; border-radius: 7px; background: #934726; color: #fff5e1; font: 550 13px/1.5 var(--ui-font); cursor: pointer; transition: background-color .16s ease; }
+.path-primary:hover { background: #7e3d23; }
+.path-primary svg { width: 19px; height: 19px; }
+.path-primary:disabled { background: #d6cbb6; border-color: #c5baa3; color: #8e8472; cursor: default; }
+.path-workspace-footer { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0 15px; border-top: 1px solid #cfc1a5; color: #8a7d68; font: 10px/1.5 var(--ui-font); }
+.path-lesson-top { display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%; color: #8b7b64; font-size: 11px; }
+.path-text-button { display: inline-flex; align-items: center; gap: 7px; background: none; border: 0; padding: 0; color: #7a583c; font: 12px/1.5 var(--ui-font); cursor: pointer; }
+.path-text-button:hover { text-decoration: underline; }
+.path-text-button svg { width: 15px; height: 15px; }
+.path-stepper { display: flex; gap: 5px; width: 100%; margin: 13px 0 22px; }
+.path-stepper i { flex: 1; height: 3px; background: #d8cbb4; border-radius: 2px; }
+.path-stepper .is-active { background: #8f5d3c; }
+.path-rule-list { margin: 17px 0 4px; padding: 0 0 0 17px; font: 12px/1.65 var(--ui-font); color: #6a6659; }
+.path-rule-list li { padding-left: 3px; margin-bottom: 9px; }
+.path-rule-list li::marker { color: #a37b55; }
+#room.vellum-study .study-body .path-example { align-self: stretch; margin: 19px 0; padding: 17px 20px; border: 1px solid #d6c6a9; border-left: 3px solid #ac8257; border-radius: 0 6px 6px 0; background: #e9dec6; font: 500 22px/1.5 var(--vellum-serif); color: #41493d; }
+.path-choices { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.path-choices button { min-height: 42px; padding: 10px 13px; text-align: left; border: 1px solid #bfb49b; border-radius: 6px; background: #f6eedb; color: #515448; font: 13px/1.5 var(--ui-font); cursor: pointer; }
+.path-choices button:hover { background: #e8dfc7; }
+.path-choices button[aria-pressed=true] { border-color: #64704f; background: #e0e0c8; color: #35422f; box-shadow: inset 3px 0 #64704f; }
+.path-choices button:disabled { cursor: default; opacity: 1; }
+.path-feedback { width: 100%; }
+.path-feedback:not(:empty) { margin: 15px 0 0; padding: 12px 14px; border-radius: 6px; background: #e1e3cb; border: 1px solid #bdc2a1; }
+.path-feedback.is-hint { background: #ecdfc4; border-color: #d1bc94; }
+.path-feedback strong { display: block; margin-bottom: 4px; color: #4d5d3b; font-size: 12px; }
+#room.vellum-study .path-feedback p { font-size: 12px; }
+.path-completion-mark { margin: 7px 0 19px; width: 50px; height: 50px; border-radius: 50%; background: #e0e2c8; color: #5b6b43; display: grid; place-items: center; }
+.path-completion-mark svg { width: 29px; height: 29px; }
+.path-completion-summary { display: flex; align-items: baseline; gap: 12px; margin: 24px 0; color: #68714e; }
+.path-completion-summary strong { font: 500 31px/1 var(--vellum-serif); }
+.path-completion-summary span { font-size: 12px; }
+#room.vellum-study .path-next-label { margin-bottom: 12px; font-size: 12px; }
+#room.vellum-study .path-detail :focus-visible, #room.vellum-study .path-route :focus-visible { outline: 2px solid #63704c; outline-offset: 3px; }
+#room.vellum-study #pathDetailTitle:focus { outline: none; }
+@media (min-width: 601px) and (max-width: 1100px) {
+  #room.vellum-study[data-section=path] .study-panel { padding: 0 20px; width: calc(100% - var(--nav-w) - 72px); }
+  .path-layout { grid-template-columns: minmax(0,1fr); }
+  .path-route { padding: 16px 0; border-right: 0; border-bottom: 1px solid #d3c6ad; }
+  .path-route-heading { display: none; }
+  .path-filters { margin: 0 0 10px; }
+  .path-topic-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px; }
+  .path-topic-list li::before, .path-topic-arrow, .path-route-note { display: none; }
+  .path-topic { height: 100%; padding: 9px 7px; margin: 0; gap: 8px; }
+  .path-topic-copy strong { font-size: 11px; }
+  .path-node { width: 24px; height: 24px; font-size: 10px; }
+  .path-detail { padding: 23px 0; }
+  .path-workspace-footer > span:last-child { display: none; }
+}
+@media (max-width: 600px) {
+  #room.vellum-study[data-section=path] .study-panel { top: var(--panel-top); left: 10px; right: 10px; width: auto; max-width: none; max-height: calc(100% - var(--panel-top) - 74px); padding: 0 17px; }
+  #room.vellum-study[data-section=path] .study-panel-header { min-height: 38px; padding-top: 3px; }
+  #room.vellum-study[data-section=path] .study-panel h1 { font-size: 32px; }
+  #room.vellum-study .path-intro { gap: 15px; padding-bottom: 15px; }
+  #room.vellum-study .path-intro p { font-size: 12px; }
+  .path-total { width: 90px; font-size: 10px; }
+  .path-layout { grid-template-columns: minmax(0,1fr); min-height: 0; }
+  .path-route { padding: 14px 0; border: 0; border-bottom: 1px solid #d3c6ad; }
+  .path-route-heading, .path-route-note { display: none; }
+  .path-filters { margin: 0 0 12px; }
+  .path-topic-list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 7px; scrollbar-width: thin; scrollbar-color: #b9b397 transparent; }
+  .path-topic-list li { flex: 0 0 195px; }
+  .path-topic-list li::before, .path-topic-arrow { display: none; }
+  .path-topic { height: 100%; padding: 9px 7px; margin: 0; gap: 9px; }
+  .path-topic-copy strong { font-size: 11px; }
+  .path-node { width: 26px; height: 26px; }
+  .path-detail { padding: 22px 0; }
+  #room.vellum-study .path-detail h2 { font-size: 28px; }
+  .path-workspace-footer { font-size: 9px; }
+  .path-workspace-footer > span:last-child { display: none; }
+}

@@ -1,0 +1,373 @@
+/* KuniLingo design contract. Shared surfaces and controls; loaded after legacy sheets. */
+#room.ui-study.vellum-study {
+  --study-green:#394331;
+  --study-success:#3d593b;
+  --study-orange:#934726;
+  --study-orange-hover:var(--study-orange);
+  --study-cream:#fff3dd;
+  --study-paper:#f2ead8;
+  --study-ink:#354336;
+  --study-muted:#786f5d;
+  --study-focus:#c98b54;
+  --study-radius-control:10px;
+  --study-radius-sheet:14px;
+  --study-motion-duration:320ms;
+  --study-motion-ease:cubic-bezier(.22,1,.36,1);
+  --study-motion:var(--study-motion-duration) var(--study-motion-ease);
+  --study-text-small:11px;
+  --study-text-control:13px;
+  --study-text-body:15px;
+  --study-sheet-pad:clamp(24px,3vw,40px);
+  --study-space:8px;
+}
+
+/* The same optical layer on the left menu and both right rails. */
+#room.vellum-study > :is(.course-notes,.practice-rail) {
+  --notes-glass-fill:var(--study-glass-fill);
+  --notes-glass-shadow:var(--study-glass-shadow);
+  --notes-glass-filter:var(--study-glass-filter);
+  color:var(--study-cream);
+}
+#room.vellum-study > :is(.course-notes,.practice-rail)::before {
+  background:var(--study-glass-fill);box-shadow:var(--study-glass-shadow);
+  -webkit-backdrop-filter:var(--study-glass-filter);backdrop-filter:var(--study-glass-filter);
+}
+#room.vellum-study:has(.paper-menu:not(.has-glass)) > :is(.course-notes,.practice-rail)::before {display:none;}
+/* Fade the glass and content themselves. Fading their parent creates a new
+   backdrop root mid-transition and makes the lens visibly snap at opacity 1. */
+#room.ui-study.vellum-study[data-section] > :is(.course-notes,.practice-rail) {
+  opacity:1;transition:none;transform:none;
+}
+#room.ui-study.vellum-study > :is(.course-notes,.practice-rail)::before,
+#room.ui-study.vellum-study > :is(.course-notes,.practice-rail) > :is(header,.study-rail-content) {
+  opacity:1;transition:opacity var(--study-motion);
+}
+#room.ui-study.vellum-study[data-section=path]:not([data-path-reveal=ready]) > .course-notes::before,
+#room.ui-study.vellum-study[data-section=path]:not([data-path-reveal=ready]) > .course-notes > :is(header,.study-rail-content),
+#room.ui-study.vellum-study[data-section=practice]:not([data-practice-reveal=ready]) > .practice-rail::before,
+#room.ui-study.vellum-study[data-section=practice]:not([data-practice-reveal=ready]) > .practice-rail > :is(header,.study-rail-content) {
+  opacity:0;
+}
+@media (prefers-reduced-motion:reduce) {
+  #room.ui-study.vellum-study > :is(.course-notes,.practice-rail)::before,
+  #room.ui-study.vellum-study > :is(.course-notes,.practice-rail) > :is(header,.study-rail-content) {transition:none;}
+}
+#room.vellum-study :is(.course-notes,.practice-rail) > header {padding:0 0 16px 12px;}
+#room.vellum-study :is(.course-notes-toggle,.practice-rail-toggle) {
+  display:grid;grid-template-columns:20px minmax(0,1fr) 16px;align-items:center;gap:12px;
+  width:100%;min-height:60px;padding:12px 20px 12px 16px;
+  border:0;border-radius:10px 0 0 16px;background:var(--study-green);color:var(--study-cream);
+  font:400 25px/1.3 var(--vellum-serif);text-align:left;text-shadow:none;
+  transition:background var(--study-motion),color var(--study-motion);
+}
+#room.vellum-study :is(.course-notes-toggle,.practice-rail-toggle):hover {background:#46523e;}
+#room.vellum-study :is(.course-notes-toggle,.practice-rail-toggle) > span {min-width:0;}
+#room.vellum-study :is(.course-notes-toggle,.practice-rail-toggle) > svg {width:20px;height:20px;color:#dcc7a3;}
+#room.vellum-study :is(.course-notes-toggle,.practice-rail-toggle) > svg:last-child {width:16px;height:16px;}
+
+/* One bounded, animated region per rail. Scrolling belongs to its body. */
+#room.vellum-study .study-rail-content {min-height:0;flex:0 1 auto;max-height:calc(100dvh - max(28px,4vh) - 160px);}
+#room.vellum-study .study-rail-content > .study-disclosure-inner {display:flex;flex-direction:column;min-height:0;max-height:inherit;}
+#room.vellum-study :is(.course-notes-body,.practice-rail-body),
+#room.vellum-study [data-open=false] :is(.course-notes-body,.practice-rail-body) {
+  display:block;position:static;flex:1 1 auto;min-height:0;width:100%;box-sizing:border-box;
+  padding:0 20px 8px;max-height:inherit;overflow:auto;overscroll-behavior:contain;
+  border:0;background:none;box-shadow:none;backdrop-filter:none;scrollbar-width:none;
+}
+#room.vellum-study .practice-filter-actions,
+#room.vellum-study .practice-rail[data-open=false] .practice-filter-actions {
+  display:grid;position:static;flex:0 0 auto;width:100%;box-sizing:border-box;
+  padding:16px 20px 0;gap:8px;background:none;border-top:1px solid #fff1d72b;
+}
+#room.vellum-study .course-note-group {margin:0;padding:0 0 8px;}
+#room.vellum-study .course-note-group > summary {padding:16px 0;font:500 var(--study-text-control)/1.55 var(--ui-font);}
+#room.vellum-study .course-note-item {
+  display:grid;grid-template-columns:16px minmax(0,1fr) 16px;align-items:center;gap:8px;
+  width:100%;padding:12px;margin:4px 0 8px;min-height:44px;border-radius:var(--study-radius-control);
+  font:400 var(--study-text-control)/1.5 var(--ui-font);background:#f2e8d3ed;color:var(--study-ink);
+  transition:background var(--study-motion),color var(--study-motion);
+}
+#room.vellum-study .course-note-item > svg {width:16px;height:16px;color:currentColor;}
+#room.vellum-study .course-note-item:hover {background:#fff3dd;}
+#room.vellum-study .course-note-item[aria-current=true] {background:var(--study-orange);color:var(--study-cream);}
+
+/* Chevron placement and motion never depend on a font glyph or [open] timing. */
+#room.vellum-study .study-disclosure-summary {
+  display:grid;grid-template-columns:minmax(0,1fr) 16px;align-items:center;gap:12px;
+  list-style:none;cursor:pointer;user-select:none;
+}
+#room.vellum-study .study-disclosure-summary::after,
+#room.vellum-study .study-disclosure-summary::before,
+#room.vellum-study .study-disclosure-summary::-webkit-details-marker {display:none;content:none;}
+.study-disclosure-label {display:block;min-width:0;}
+#room.vellum-study .study-disclosure-chevron {
+  display:block;width:16px;height:16px;flex:none;transform:rotate(0);transform-origin:center;
+  transition:transform var(--study-motion);color:inherit;
+}
+#room.vellum-study [aria-expanded=true] > .study-disclosure-chevron {transform:rotate(180deg);}
+.study-disclosure-content {min-width:0;}
+.study-disclosure-content[hidden] {display:none!important;}
+.study-disclosure-inner {display:flow-root;min-width:0;}
+#room.vellum-study .practice-rule-group > .study-disclosure-content {padding:0;}
+#room.vellum-study .practice-rule-group > .study-disclosure-content > .study-disclosure-inner {padding:0 0 4px 8px;}
+
+/* Single-choice fields unfold in place; no operating-system popup is exposed. */
+.study-select {min-width:0;position:relative;border-radius:var(--study-radius-control);overflow:hidden;background:var(--study-paper);isolation:isolate;}
+.study-select > select[hidden] {display:none!important;}
+#room.vellum-study .study-select-trigger {
+  display:grid;grid-template-columns:minmax(0,1fr) 16px;align-items:center;gap:12px;
+  width:100%;min-height:44px;padding:12px;border:0;border-radius:0;
+  background:transparent;color:var(--study-ink);text-align:left;
+  font:400 var(--study-text-control)/1.55 var(--ui-font);cursor:pointer;
+  transition:color var(--study-motion);
+}
+.study-select-value {min-width:0;overflow-wrap:anywhere;}
+#room.vellum-study .study-select-trigger:hover {background:transparent;color:var(--study-orange);}
+#room.vellum-study .study-select[data-open=true] .study-select-trigger {border-radius:0;background:transparent;}
+.study-select-menu {overflow:hidden;border-radius:0;background:transparent;}
+.study-select-options {max-height:min(280px,40dvh);overflow:auto;overscroll-behavior:contain;scrollbar-width:none;padding:0 6px 6px;box-sizing:border-box;}
+#room.vellum-study .study-select-option {
+  display:block;width:100%;padding:10px 8px;border:0;border-radius:7px;min-height:40px;
+  background:transparent;color:var(--study-ink);text-align:left;
+  font:400 var(--study-text-control)/1.55 var(--ui-font);cursor:pointer;
+  transition:background var(--study-motion),color var(--study-motion);
+}
+#room.vellum-study .study-select-option:hover,
+#room.vellum-study .study-select-option.is-highlighted {background:#e4d8c1;}
+#room.vellum-study .study-select-option[aria-selected=true] {background:var(--study-orange);color:var(--study-cream);}
+#room.vellum-study .practice-filter-field {gap:8px;margin-bottom:24px;}
+#room.vellum-study .practice-filter-field > label,
+#room.vellum-study .practice-rule-list legend {font:500 var(--study-text-control)/1.5 var(--ui-font);}
+#room.vellum-study .practice-rule-list > p {font-size:var(--study-text-small);line-height:1.6;margin:4px 0 12px;}
+#room.vellum-study .practice-rule-group > summary {padding:12px 0;font:500 var(--study-text-control)/1.5 var(--ui-font);}
+#room.vellum-study .practice-rule {
+  display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:start;gap:10px;
+  margin:4px -6px;padding:10px 6px;border-radius:8px;
+  font:400 var(--study-text-control)/1.55 var(--ui-font);
+  transition:background var(--study-motion),color var(--study-motion);
+}
+#room.vellum-study .practice-rule:hover {background:#fff3dd14;}
+#room.vellum-study .practice-rule:has(input:checked) {background:#934726dc;color:var(--study-cream);text-shadow:none;}
+#room.vellum-study .practice-rule > small {padding-top:2px;font:400 var(--study-text-small)/1.6 var(--ui-font);font-variant-numeric:tabular-nums;}
+
+/* Same drawn check and radio shapes in filters, lessons and self-assessment. */
+#room.vellum-study :is(.practice-rail,.study-body) input:is([type=checkbox],[type=radio]) {
+  appearance:none;-webkit-appearance:none;display:inline-grid;place-content:center;
+  width:18px;height:18px;min-width:18px;min-height:18px;flex:none;margin:2px 0 0;padding:0;
+  border:1px solid #a38b66;border-radius:5px;background:#f2e8d329;color:var(--study-cream);
+  vertical-align:middle;cursor:pointer;transition:background var(--study-motion),border-color var(--study-motion);
+}
+#room.vellum-study :is(.practice-rail,.study-body) input[type=radio] {border-radius:50%;}
+#room.vellum-study :is(.practice-rail,.study-body) input:is([type=checkbox],[type=radio])::after {
+  content:'';width:10px;height:10px;transform:scale(0);background:currentColor;
+  clip-path:polygon(12% 44%,39% 68%,88% 12%,100% 25%,40% 94%,0 57%);
+  transition:transform var(--study-motion);
+}
+#room.vellum-study :is(.practice-rail,.study-body) input[type=radio]::after {clip-path:none;border-radius:50%;width:8px;height:8px;}
+#room.vellum-study :is(.practice-rail,.study-body) input:is([type=checkbox],[type=radio]):checked {background:var(--study-orange);border-color:#e0b98a;}
+#room.vellum-study :is(.practice-rail,.study-body) input:is([type=checkbox],[type=radio]):checked::after {transform:scale(1);}
+#room.vellum-study .course-options label:has(input:checked) {background:#ead6bf;border-color:#b8734c;}
+#room.vellum-study .practice-rule:has(input:disabled) {opacity:.4;}
+
+/* Shared sheet type scale, spacing and primary / secondary actions. */
+#room.vellum-study :is(.course-lesson-view,.practice-view) {--course-paper:var(--study-paper);color:var(--study-ink);}
+#room.ui-study.vellum-study .study-panel:has(:is(.course-lesson-view,.practice-view)) {padding-inline:var(--study-sheet-pad);border-radius:8px var(--study-radius-sheet) var(--study-radius-sheet) 8px;}
+#room.vellum-study :is(.course-hero,.practice-hero) {display:grid;gap:16px;margin:0 0 32px;}
+#room.vellum-study :is(.course-lesson-view .course-hero,.practice-hero) h2 {
+  margin:0;color:var(--study-ink);font:400 clamp(32px,3vw,44px)/1.12 var(--vellum-serif);letter-spacing:-.03em;
+}
+#room.vellum-study :is(.course-hero,.practice-hero) > p {margin:0;color:var(--study-muted);font:400 14px/1.7 var(--ui-font);}
+#room.vellum-study :is(.course-reading,.practice-source-content),
+#room.vellum-study .course-lesson-view .course-reading :is(p,li) {font:400 var(--study-text-body)/1.8 var(--ui-font);color:var(--study-ink);}
+#room.vellum-study .course-reading h3 {font:600 13px/1.5 var(--ui-font);margin:0 0 12px;}
+#room.vellum-study :is(.course-primary,.practice-primary) {
+  min-height:44px;padding:12px 20px;border:0;border-radius:var(--study-radius-control);
+  background:var(--study-orange);color:var(--study-cream);font:500 var(--study-text-control)/1.5 var(--ui-font);
+  transition:background var(--study-motion),color var(--study-motion),transform var(--study-motion);
+}
+#room.vellum-study :is(.course-primary,.practice-primary):not(:disabled):hover {background:var(--study-orange-hover);}
+#room.vellum-study :is(.course-primary,.practice-primary):not(:disabled):active {transform:scale(.98);}
+#room.vellum-study :is(.course-secondary,.practice-secondary,.course-stage-nav button) {
+  border-radius:var(--study-radius-control);font:500 var(--study-text-control)/1.5 var(--ui-font);
+  transition:background var(--study-motion),color var(--study-motion);
+}
+#room.vellum-study .course-stage-nav {border-radius:14px;}
+#room.vellum-study .course-stage-nav button[aria-current=step] {background:var(--study-orange);color:var(--study-cream);}
+#room.vellum-study .course-stage-nav button[aria-current=step] > span {color:#f4d1ac;}
+#room.vellum-study :is(.course-options label,.course-example,.course-trap,.practice-format-note) {border-radius:var(--study-radius-control);}
+#room.vellum-study :is(.practice-filter-field,.practice-answer,.course-input,.course-dictionary-search) :is(input:not([type=checkbox]):not([type=radio]),textarea) {
+  box-sizing:border-box;min-height:44px;border:0;border-radius:var(--study-radius-control);
+  padding:12px;background:#f7efdf;color:var(--study-ink);font:400 var(--study-text-control)/1.6 var(--ui-font);
+  transition:background var(--study-motion);caret-color:var(--study-orange);
+}
+#room.vellum-study .practice-question-copy strong {font-size:14px;line-height:1.5;}
+#room.vellum-study .practice-question-copy > span {font-size:12px;line-height:1.6;}
+#room.vellum-study .practice-question-row {border-radius:var(--study-radius-control);transition:background var(--study-motion),color var(--study-motion);}
+#room.vellum-study .practice-catalog-note {font:400 12px/1.7 var(--ui-font);}
+#room.vellum-study .practice-answer-status {font:400 13px/1.7 var(--ui-font);}
+#room.vellum-study :is(.study-body,.course-notes,.practice-rail) :is(button,input,textarea,summary):focus:not(:focus-visible) {outline:none;}
+#room.vellum-study :is(.study-body,.course-notes,.practice-rail) :is(button,input,textarea,summary):focus-visible {outline:2px solid var(--study-focus);outline-offset:3px;}
+#room.vellum-study :is(.study-select-trigger,.study-select-option):focus-visible {outline:none;}
+#room.vellum-study .study-select-trigger:focus-visible .study-select-value {text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;}
+#room.vellum-study :is(.practice-filter-field,.practice-answer,.course-input,.course-dictionary-search) :is(input:not([type=checkbox]):not([type=radio]),textarea):focus {outline:none;box-shadow:none;border:0;background:#fff9ed;}
+#room.vellum-study .study-select-options::-webkit-scrollbar {display:none;}
+#room.vellum-study [data-course-focus]:focus {outline:none;}
+#room.vellum-study[data-section=path] .study-panel.course-opening:has(.course-lesson-view),
+#room.vellum-study[data-section=path] .study-panel.course-closing:has(.course-lesson-view),
+#room.vellum-study[data-section=path] .study-panel.course-map-return:has(.course-map-view) {animation-duration:var(--study-motion-duration);animation-timing-function:var(--study-motion-ease);}
+.study-sheet-enter {animation:study-sheet-enter86 var(--study-motion) both;}
+@keyframes study-sheet-enter86 {from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+#room.vellum-study .practice-instruction {margin:8px 0 28px;font-weight:500;line-height:1.65;}
+#room.vellum-study .practice-instruction > :first-child {margin-top:0;}
+#room.vellum-study .practice-instruction > :last-child {margin-bottom:0;}
+#room.vellum-study .practice-material {margin:0 0 32px;padding-top:24px;border-top:1px solid #d6cbb5;}
+#room.vellum-study .practice-instruction[hidden] ~ .practice-material {padding-top:0;border:0;}
+#room.vellum-study .practice-task-view .practice-passage {margin:0 0 28px;}
+#room.vellum-study .practice-answer-hint {margin:0 0 8px;font:400 12px/1.6 var(--ui-font);color:var(--study-muted);}
+#room.vellum-study .practice-task-view .practice-topline {margin-bottom:24px;}
+
+@media(max-width:1050px) {
+  #room.vellum-study :is(.course-notes,.practice-rail) > header {padding:0 0 0 12px;}
+  #room.vellum-study :is(.course-notes-toggle,.practice-rail-toggle) {min-height:48px;font-size:20px;padding:12px 16px;gap:8px;}
+  #room.vellum-study .study-rail-content {
+    position:absolute;right:0;bottom:60px;width:min(320px,calc(100vw - 24px));
+    max-height:calc(100dvh - 180px);border-radius:14px 0 0 14px;
+    background:var(--study-glass-fill);box-shadow:var(--study-glass-shadow);
+    -webkit-backdrop-filter:var(--study-glass-filter);backdrop-filter:var(--study-glass-filter);
+  }
+  #room.vellum-study .study-rail-content > .study-disclosure-inner {padding:16px 0;box-sizing:border-box;}
+  #room.vellum-study .practice-filter-actions {padding-bottom:0;}
+  #room.vellum-study:has(.paper-menu:not(.has-glass)) .study-rail-content {background:none;box-shadow:none;backdrop-filter:none;}
+}
+@media(max-width:600px) {
+  #room.ui-study.vellum-study {--study-text-body:14px;}
+  #room.vellum-study :is(.course-hero,.practice-hero) {gap:12px;margin-bottom:24px;}
+  #room.vellum-study :is(.course-lesson-view .course-hero,.practice-hero) h2 {font-size:32px;}
+}
+@media(prefers-reduced-transparency:reduce) {
+  #room.vellum-study :is(.course-note-group > summary,.practice-filter-field > label,.practice-rule,.practice-rule-list legend,.practice-rule-group > summary,.practice-rule-list > p,.practice-filter-reset) {color:var(--study-ink);text-shadow:none;}
+  #room.vellum-study .practice-rule:has(input:checked) {color:var(--study-cream);}
+}
+@media(prefers-reduced-motion:reduce) {
+  #room.ui-study.vellum-study {--study-motion-duration:0ms;}
+}
+
+/* Two semantic greens and one orange across the menu, route and exercises. */
+#room.ui-study.vellum-study {--rust:var(--study-orange);--course-olive:var(--study-green);--course-copper:var(--study-orange);--course-complete:var(--study-success);}
+#room.vellum-study .vellum-signature,
+#room.vellum-study :is(.course-notes-toggle,.practice-rail-toggle):hover {background:var(--study-green);}
+#room.vellum-study .trail-chapter-head::before {
+  background:url('./assets/title-brush77.svg') center / 100% 100% no-repeat;
+  -webkit-mask:none;mask:none;
+}
+#room.vellum-study .trail-chapter-head :is(h2,span) {color:var(--study-cream);}
+#room.vellum-study .trail-stop.is-active {--orb-fill:var(--study-orange);--orb-edge:var(--study-orange);--orb-ink:var(--study-cream);}
+#room.vellum-study .trail-stop.is-next {--orb-edge:var(--study-orange);--orb-ink:var(--study-orange);}
+#room.vellum-study .trail-stop.is-active.is-next {--orb-ink:var(--study-cream);}
+#room.vellum-study .trail-stop.is-done {--orb-fill:var(--study-success);--orb-edge:var(--study-success);--orb-ink:var(--study-cream);}
+#room.vellum-study .trail-stop:not(:disabled):is(:hover,.is-opening) .trail-orb {background:var(--study-orange);border-color:var(--study-orange);color:var(--study-cream);}
+#room.vellum-study .trail-stop.is-done:not(:disabled):is(:hover,.is-opening) .trail-orb {background:var(--study-success);border-color:var(--study-success);}
+#room.vellum-study .trail-orb::after {border-color:var(--study-orange);}
+#room.vellum-study .trail-stop:is(.is-active,.is-next) .trail-step-kind {color:var(--study-orange);}
+#room.vellum-study .trail-stop.is-done .trail-step-kind {color:var(--study-success);}
+#room.vellum-study :is(.course-reading h3,.course-word-group summary,.course-feedback:not(.is-miss)) {color:var(--study-green);}
+#room.vellum-study .course-lesson-view .course-reading .course-example,
+#room.vellum-study .course-feedback:not(.is-miss) {background:color-mix(in srgb,var(--study-success) 12%,var(--study-paper));}
+#room.vellum-study .course-lesson-view .course-reading .course-trap,
+#room.vellum-study .course-feedback.is-miss {background:color-mix(in srgb,var(--study-orange) 12%,var(--study-paper));}
+#room.vellum-study :is(.course-word-group b,.course-nav button,.practice-back,.practice-record-id),
+#room.vellum-study .course-reading li::marker {color:var(--study-orange);}
+#room.vellum-study .course-stage-nav button[aria-current=step]:hover {background:var(--study-orange);color:var(--study-cream);}
+#room.vellum-study .practice-rule:has(input:checked) {background:var(--study-orange);}
+
+/* The hit target is the visible 72px orb; captions do not enlarge it. */
+#room.vellum-study .course-map-view .trail-stop {
+  width:72px;height:72px;max-width:none;min-height:0;min-width:0;border-radius:50%;overflow:visible;
+}
+#room.vellum-study .course-map-view .trail-caption {
+  position:absolute;top:calc(100% + 11px);left:50%;transform:translateX(-50%);
+  width:max-content;max-width:min(248px,58vw);box-sizing:border-box;margin:0;pointer-events:none;
+}
+#room.vellum-study .trail-orb > svg {visibility:visible;opacity:1;stroke:currentColor;}
+#room.vellum-study .course-note-group > summary {list-style:none;}
+#room.vellum-study .course-note-group > summary::marker {content:'';}
+#room.vellum-study .course-note-group > summary::-webkit-details-marker {display:none;}
+#room.vellum-study .course-note-group > summary::after {content:none;display:none;}
+#room.vellum-study .course-note-item > .course-note-link-chevron {transform:rotate(-90deg);opacity:1;}
+#room.vellum-study .practice-question-row[aria-busy=true] {opacity:.65;}
+
+/* One integrated drawing menu, at the inside lower edge of the exercise paper. */
+#room.vellum-study .practice-workspace {position:relative;margin-bottom:32px;}
+#room.vellum-study [data-design=folders] .practice-workspace > .practice-material {margin-bottom:0;padding-bottom:16px;border-bottom-left-radius:0;border-bottom-right-radius:0;}
+#room.vellum-study .practice-pencil {position:sticky;bottom:0;z-index:3;display:flex;flex-wrap:wrap;justify-content:flex-end;margin:0;padding:8px 16px 12px;background:#f9f3e5;border-radius:0 0 12px 12px;}
+#room.vellum-study .practice-workspace:has(.practice-material[hidden]) .practice-pencil {padding:8px 0;background:var(--study-paper);border-radius:12px;}
+#room.vellum-study .practice-pencil-tools {display:inline-flex;flex-wrap:wrap;align-items:center;gap:2px;max-width:100%;padding:4px;background:color-mix(in srgb,var(--study-green) 7%,#f9f3e5);border-radius:var(--study-radius-control);}
+#room.vellum-study .practice-pencil-tools button {
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-width:44px;min-height:44px;padding:8px;border:0;border-radius:8px;
+  background:transparent;color:var(--study-ink);
+  font:400 var(--study-text-control)/1.4 var(--ui-font);box-shadow:none;text-shadow:none;
+  transition:background var(--study-motion),color var(--study-motion);
+}
+#room.vellum-study .practice-pencil-tools button:hover {background:color-mix(in srgb,var(--study-green) 14%,var(--study-paper));}
+#room.vellum-study .practice-pencil-tools button[aria-pressed=true] {background:var(--study-orange);color:var(--study-cream);}
+#room.vellum-study .practice-pencil-tools button:focus-visible {outline:2px solid var(--study-focus);outline-offset:2px;}
+#room.vellum-study .practice-pencil-tools button:disabled {opacity:.4;cursor:default;}
+#room.vellum-study .practice-pencil-tools svg {width:20px;height:20px;flex:none;}
+#room.vellum-study .practice-pencil-option {position:relative;display:flex;}
+#room.vellum-study .practice-pencil-option > button {gap:4px;}
+#room.vellum-study .practice-pencil-option > button > .study-disclosure-chevron {width:12px;height:12px;}
+#room.vellum-study .practice-pencil-popover {position:absolute;right:0;bottom:calc(100% + 8px);width:max-content;max-width:calc(100vw - 48px);border-radius:var(--study-radius-control);background:var(--study-paper);box-shadow:0 4px 16px #35433625;}
+#room.vellum-study .practice-pencil-popover > .study-disclosure-inner {display:flex;gap:4px;padding:8px;}
+#room.vellum-study .practice-pencil-color-dot {display:block;width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1px #35433620;}
+#room.vellum-study .practice-pencil-popover [data-pencil-color][aria-pressed=true] {background:color-mix(in srgb,var(--study-orange) 16%,var(--study-paper));}
+#room.vellum-study .practice-pencil-popover [data-pencil-color][aria-pressed=true] > span {outline:2px solid var(--study-orange);outline-offset:3px;}
+#room.vellum-study .practice-pencil-error {flex-basis:100%;margin-top:8px;font:400 var(--study-text-small)/1.5 var(--ui-font);color:var(--study-orange);text-align:right;}
+#room.vellum-study .practice-pencil-surface {position:relative;isolation:isolate;}
+#room.vellum-study .practice-instruction.practice-pencil-surface > :nth-last-child(2),
+#room.vellum-study .practice-material.practice-pencil-surface > p:nth-last-child(2) {margin-bottom:0;}
+#room.vellum-study .practice-source-content > svg.practice-pencil-layer {
+  position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;max-height:none;
+  margin:0;padding:0;overflow:hidden;z-index:1;pointer-events:none;fill:none;
+  stroke:var(--study-ink);stroke-linecap:round;stroke-linejoin:round;opacity:.9;
+}
+#room.vellum-study .practice-source-content[data-pencil-mode=pencil] > svg.practice-pencil-layer,
+#room.vellum-study .practice-source-content[data-pencil-mode=eraser] > svg.practice-pencil-layer {pointer-events:all;touch-action:none;user-select:none;cursor:crosshair;}
+#room.vellum-study .practice-source-content[data-pencil-mode=eraser] > svg.practice-pencil-layer {cursor:cell;}
+
+/* The same content cards serve the context rail and the Path handbook. */
+#room.vellum-study .study-guide-topic {margin:0 0 8px;min-width:0;border:0;}
+#room.vellum-study .study-guide-topic > summary {
+  display:grid;grid-template-columns:minmax(0,1fr) 16px;align-items:center;gap:12px;
+  min-height:44px;padding:12px;border-radius:var(--study-radius-control);
+  background:color-mix(in srgb,var(--study-paper) 94%,transparent);color:var(--study-green);
+  font:500 var(--study-text-control)/1.6 var(--ui-font);list-style:none;cursor:pointer;
+}
+#room.vellum-study .study-guide-topic > summary:focus-visible {outline:2px solid var(--study-focus);outline-offset:2px;}
+#room.vellum-study .study-guide-topic > summary::after {content:none;}
+#room.vellum-study .study-guide-topic > summary::marker {content:'';}
+#room.vellum-study .study-guide-topic > summary::-webkit-details-marker {display:none;}
+#room.vellum-study .study-guide-topic > summary > svg {width:16px;height:16px;}
+#room.vellum-study .study-guide-reading {
+  min-width:0;padding:16px 12px 24px;color:var(--study-ink);background:var(--study-paper);
+  border-radius:0 0 var(--study-radius-control) var(--study-radius-control);
+  font:400 var(--study-text-body)/1.8 var(--ui-font);overflow-wrap:break-word;text-shadow:none;
+}
+#room.vellum-study .study-guide-topic[data-expanded=true] > summary {border-bottom-left-radius:0;border-bottom-right-radius:0;}
+#room.vellum-study .study-guide-reading p {margin:0 0 12px;}
+#room.vellum-study .study-guide-reading section {margin:0 0 24px;}
+#room.vellum-study .study-guide-reading h4 {margin:0 0 8px;color:var(--study-green);font:500 14px/1.6 var(--ui-font);}
+#room.vellum-study .study-guide-reading :is(ul,ol) {margin:0;padding-left:20px;}
+#room.vellum-study .study-guide-reading li {margin:0 0 8px;}
+#room.vellum-study .study-guide-reading figure {margin:0 0 16px;padding:12px;border-radius:10px;background:color-mix(in srgb,var(--study-green) 6%,var(--study-paper));}
+#room.vellum-study .study-guide-reading blockquote {margin:0 0 8px;font-style:normal;}
+#room.vellum-study .study-guide-reading figcaption {font-size:14px;line-height:1.7;}
+#room.vellum-study .study-guide-sources {margin:16px 0 0;}
+#room.vellum-study .study-guide-sources > summary {min-height:44px;font:400 var(--study-text-control)/1.6 var(--ui-font);color:var(--study-muted);}
+#room.vellum-study .study-guide-sources li {font-size:var(--study-text-small);line-height:1.7;}
+#room.vellum-study .study-guide-sources a {color:var(--study-green);text-decoration:underline;text-underline-offset:3px;}
+#room.vellum-study .study-guide-sources small {display:block;font-size:inherit;color:var(--study-muted);}
+#room.vellum-study .course-topic-handbook {margin-top:32px;}
+#room.vellum-study .course-topic-handbook > h3 {margin:0 0 16px;}
+#room.vellum-study .practice-guide-body {padding-top:8px;}
+@media(max-width:600px){#room.vellum-study .study-guide-reading {font-size:14px;}}

@@ -1,0 +1,139 @@
+/* Larger route; selected edge-to-edge glass notes rail; no native scroll chrome. */
+#room.vellum-study[data-section=path] {--course-notes-width:clamp(240px,19vw,278px);}
+#room.vellum-study[data-section=path] .study-panel:has(.course-map-view) {
+  width:min(880px,calc(100% - var(--course-left-gutter) - var(--course-right-gutter)));
+  box-sizing:border-box;
+}
+.course-map-view .trail-main {max-width:720px;}
+.course-map-view .trail-chapter-head {min-width:min(360px,100%);padding:26px 40px 28px;margin-bottom:40px;box-sizing:border-box;}
+.course-map-view .trail-chapter-head > span {font-size:12px;gap:13px;}
+#room.vellum-study .course-map-view .trail-chapter h2,
+#room.vellum-study .course-map-view .trail-finish h2 {font-size:clamp(32px,3vw,40px);}
+.course-map-view .course-trail-track {--trail-span:264px;}
+/* 192 / 128 scales the SVG's 24px node centre to 36px: half the 72px orb. */
+.course-map-view .course-trail-nodes li {height:192px;}
+.course-map-view .trail-stop {width:280px;max-width:calc(100% - 64px);}
+.course-map-view .trail-orb {width:72px;height:72px;}
+.course-map-view .trail-orb svg {width:32px;height:32px;}
+.course-map-view .trail-caption {margin-top:11px;padding:7px 12px;}
+.course-map-view .trail-caption strong {font-size:16px;line-height:1.35;}
+.course-map-view .trail-caption .trail-step-kind {font-size:10px;letter-spacing:.08em;margin-bottom:4px;}
+.course-map-view .trail-caption small {font-size:11px;}
+.course-map-view .course-trail-thread {stroke-width:4;stroke-dasharray:0 15;}
+.course-map-view .trail-chapter + .trail-chapter {margin-top:38px;}
+
+/* Selected “Стеклянная полоса”: continuous glass, olive tab, paper note links.
+   A separate glass layer lets the compact popup sample the room as well. */
+#room.vellum-study > .course-notes {
+  --notes-glass-fill:linear-gradient(110deg,#e9e8d849,#e4ded02b);
+  --notes-glass-shadow:inset 1px 0 4px #fff9e126;
+  --notes-glass-filter:blur(4px) saturate(1.08);
+  background:none;border:0;box-shadow:none;overflow:hidden;
+}
+#room.vellum-study > .course-notes,
+#room.vellum-study > .course-notes[data-open=false] {
+  top:0;right:0;bottom:0;width:var(--course-notes-width);height:auto;max-height:none;
+  padding:max(28px,4vh) 0 max(84px,env(safe-area-inset-bottom));border-radius:0;
+}
+#room.vellum-study > .course-notes::before {
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  border-radius:inherit;background:var(--notes-glass-fill);box-shadow:var(--notes-glass-shadow);
+  -webkit-backdrop-filter:blur(4px) saturate(1.08);
+  backdrop-filter:var(--notes-glass-filter);
+}
+#room.vellum-study .course-notes-body {
+  flex:1 1 auto;max-height:none;padding:0 max(22px,env(safe-area-inset-right)) 16px 22px;
+  background:none;border:0;box-shadow:none;
+}
+.course-notes > header {padding:0 0 15px 12px;}
+.course-notes-toggle,
+.course-notes[data-open=true] .course-notes-toggle {
+  min-height:60px;padding:12px max(18px,env(safe-area-inset-right)) 12px 18px;
+  border-radius:8px 0 0 16px;background:#3d4936;color:#f5ebd3;text-shadow:none;
+  font-size:25px;font-weight:400;gap:10px;
+}
+.course-notes-toggle > span {min-width:0;}
+.course-notes-toggle > svg:first-child,
+.course-notes-toggle > svg:last-child {color:#d9b68a;filter:none;}
+.course-notes-body > p.course-notes-empty {color:#f0e7d1;text-shadow:0 1px 4px #243124;padding:10px 0 8px;}
+.course-note-group {margin:0;padding:0 0 10px;border-top:1px solid #f4ead02e;}
+.course-note-group:first-child {border-top:0;}
+.course-note-group > summary {align-items:center;color:#fff4df;text-shadow:0 1px 4px #263549;font-size:12px;padding:16px 0;}
+.course-note-group > summary::after {color:#ecd5b0;}
+.course-note-item {background:#f2e8d3ed;color:#3a4234;margin:4px 0;padding:9px 10px;border-radius:4px;min-height:44px;font-size:13px;text-shadow:none;}
+.course-note-item > span {flex:1;}
+.course-note-item > svg:last-child {width:12px;height:12px;opacity:.6;transform:rotate(-45deg);}
+.course-note-item:hover,.course-note-item[aria-current=true] {background:#fff4dd;}
+.course-note-item:focus-visible,.course-notes-toggle:focus-visible {outline-color:#e5bc85;}
+.course-archive-flash {animation:course-note-arrive81 550ms ease-out both;}
+@keyframes course-note-arrive81 {from {background:#d9be94;transform:scale(.96);}to {background:#f2e8d3ed;transform:scale(1);}}
+
+/* Hide the track, thumb and arrow buttons; retain all normal scrolling. */
+#room.vellum-study[data-section=path] .study-panel,
+#room.vellum-study[data-section=path] .study-panel:has(.course-lesson-view),
+#room.vellum-study[data-section=path] .course-notes-body,
+#room.vellum-study[data-section=path] textarea {
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+#room.vellum-study[data-section=path] .study-panel::-webkit-scrollbar,
+#room.vellum-study[data-section=path] .course-notes-body::-webkit-scrollbar,
+#room.vellum-study[data-section=path] textarea::-webkit-scrollbar {display:none;width:0;height:0;}
+#room.vellum-study[data-section=path] .study-panel::-webkit-scrollbar-button,
+#room.vellum-study[data-section=path] .course-notes-body::-webkit-scrollbar-button,
+#room.vellum-study[data-section=path] textarea::-webkit-scrollbar-button {display:none;width:0;height:0;}
+
+@media (max-width:1050px) and (min-width:601px) {
+  #room.vellum-study[data-section=path] .study-panel:has(.course-map-view) {
+    left:calc((100% + var(--course-left-gutter) - var(--course-right-gutter)) / 2);
+  }
+  .course-map-view .course-trail-track {--trail-span:clamp(156px,20vw,210px);}
+  .course-map-view .trail-stop {width:224px;}
+  .course-map-view .trail-caption strong {font-size:14px;}
+}
+@media (max-width:1050px) {
+  #room.vellum-study > .course-notes,
+  #room.vellum-study > .course-notes[data-open=false] {
+    top:auto;right:0;bottom:max(20px,env(safe-area-inset-bottom));width:202px;
+    max-height:calc(100dvh - 160px);padding:0;overflow:visible;
+  }
+  #room.vellum-study > .course-notes::before {display:none;}
+  #room.vellum-study .course-notes-body {
+    max-height:min(480px,calc(100dvh - 210px));
+    padding:12px max(22px,env(safe-area-inset-right)) 20px 22px;border-radius:8px 0 0 8px;
+    background:var(--notes-glass-fill);box-shadow:var(--notes-glass-shadow);
+    -webkit-backdrop-filter:blur(4px) saturate(1.08);
+    backdrop-filter:var(--notes-glass-filter);
+  }
+  .course-notes > header {padding:0 0 0 12px;}
+  .course-notes-toggle,
+  .course-notes[data-open=true] .course-notes-toggle {min-height:46px;padding-block:10px;font-size:18px;}
+}
+@media (max-width:600px) {
+  #room.vellum-study[data-section=path] .study-panel:has(.course-map-view) {width:calc(100% - 24px);}
+  .course-map-view .course-trail-track {--trail-span:clamp(132px,38vw,170px);}
+  .course-map-view .trail-stop {width:clamp(180px,50vw,220px);max-width:calc(100% - 60px);}
+  .course-map-view .trail-chapter-head {min-width:0;padding:24px 26px;}
+  #room.vellum-study .course-map-view .trail-chapter h2 {font-size:32px;}
+  .course-map-view .trail-caption strong {font-size:14px;}
+  #room.vellum-study > .course-notes,
+  #room.vellum-study > .course-notes[data-open=false] {width:190px;}
+  .course-notes-toggle,
+  .course-notes[data-open=true] .course-notes-toggle {font-size:17px;}
+}
+@supports (backdrop-filter:url("#vellum-lens") blur(2px)) {
+  #room.vellum-study > .course-notes {
+    --notes-glass-filter:url("#vellum-lens") blur(3px) saturate(1.08);
+  }
+}
+@media (prefers-reduced-transparency:reduce) {
+  #room.vellum-study > .course-notes {
+    --notes-glass-fill:#d6cbb7;--notes-glass-shadow:none;--notes-glass-filter:none;
+  }
+  #room.vellum-study > .course-notes::before,
+  #room.vellum-study .course-notes-body {-webkit-backdrop-filter:none;backdrop-filter:none;}
+  .course-notes-body > p.course-notes-empty,
+  .course-note-group > summary {color:#3d4939;text-shadow:none;}
+  .course-note-group > summary::after {color:#80543a;filter:none;}
+}
+@media (prefers-reduced-motion:reduce) {.course-archive-flash {animation:none;}}
+

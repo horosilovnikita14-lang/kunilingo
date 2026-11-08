@@ -1,0 +1,12 @@
+.sites-runtime/
+.wrangler/
+outputs/
+node_modules/
+.env*
+dist/
+.openai/
+.vercel/
+work/
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,111 @@
+.route-map {
+  --map-ink: #343c34;
+  --map-muted: #675e50;
+  --map-line: #cabba1;
+  --map-paper: #fbf2de;
+}
+.map-intro, .map-toolbar, .map-footer {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.map-intro { padding: 7px 0 17px; }
+#room.vellum-study .map-intro p { margin: 0; font: 14px/1.5 var(--ui-font); }
+.map-intro a {
+  color: #60472e; background: #e9dbc2; border: 1px solid #cfbc9d;
+  border-radius: 4px; padding: 4px 9px; font-size: 11px; text-decoration: none;
+}
+.map-toolbar {
+  border-top: 1px solid var(--map-line); border-bottom: 1px solid var(--map-line);
+  padding: 9px 0; margin-bottom: 18px; color: var(--map-muted); font-size: 11px;
+}
+.map-switch { display: flex; flex-wrap: wrap; gap: 5px; }
+.route-map button { cursor: pointer; }
+.map-switch button, .map-number-grid button, .map-number-links button {
+  color: var(--map-ink); background: #f7ecd5; border: 1px solid var(--map-line);
+  border-radius: 5px; padding: 7px 12px; font: 600 12px/1.3 var(--ui-font);
+}
+.map-switch button[aria-pressed=true], .map-number-grid button[aria-pressed=true] {
+  background: #914625; border-color: #914625; color: #fff6e3;
+}
+.map-phases {
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2fr) minmax(0,1fr); gap: 12px;
+}
+.map-phase {
+  --phase-ink: #4e603e;
+  --phase-paper: #e4e5ce;
+  border: 1px solid var(--map-line); border-radius: 9px; min-width: 0; overflow: hidden;
+  background: #f7ecd6;
+}
+.map-phase[data-phase=core] { --phase-ink: #8a4829; --phase-paper: #edd9bd; }
+.map-phase[data-phase=finish] { --phase-ink: #535a69; --phase-paper: #e1e1d7; }
+.map-phase-head {
+  position: relative; padding: 12px 13px 10px; min-height: 100px;
+  border-bottom: 1px solid var(--map-line);
+  background: repeating-radial-gradient(ellipse at 120% 125%, transparent 0 12px, #5c4d3612 13px 14px, transparent 15px 23px), var(--phase-paper);
+}
+.map-phase-index, .map-label {
+  color: var(--phase-ink, #86492d); font: 650 10px/1.45 var(--ui-font); letter-spacing: .1em;
+}
+#room.vellum-study .map-phase h2, #room.vellum-study .map-sheet h2 {
+  color: var(--map-ink); font: 500 23px/1.15 var(--vellum-serif); margin: 3px 0 5px; text-wrap: pretty;
+}
+#room.vellum-study .map-phase-head p { margin: 0; color: var(--map-muted); font-size: 11px; line-height: 1.45; }
+.map-phase ol, .map-personal-list { list-style: none; padding: 8px; margin: 0; display: grid; gap: 5px; }
+.map-phase[data-phase=core] ol, .map-personal-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.map-stop {
+  display: grid; grid-template-columns: 26px minmax(0,1fr) 12px; align-items: center; gap: 7px;
+  width: 100%; height: 100%; min-height: 47px; padding: 5px; text-align: left;
+  border: 1px solid transparent; border-radius: 6px; color: var(--map-ink); background: transparent;
+  font: 12px/1.35 var(--ui-font);
+}
+.map-stop:hover, .map-stop:focus-visible { border-color: var(--map-line); background: #efe1c6; }
+.map-stop strong, .map-stop small { display: block; }
+.map-stop small { color: var(--map-muted); margin-top: 2px; font-size: 10px; }
+.map-stop > svg { width: 12px; height: 12px; color: var(--phase-ink, #86492d); }
+.map-marker {
+  display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid currentColor; background: var(--phase-paper,#edd9bd);
+  color: var(--phase-ink,#86492d); font: 650 10px/1 var(--ui-font);
+}
+.map-footer {
+  padding: 12px 0; color: var(--map-muted); font-size: 10px;
+}
+.map-footer a, .map-source { color: #744329; text-underline-offset: .18em; }
+.map-sheet { padding: 5px 0 12px; max-width: 820px; }
+.map-sheet > .path-text-button { display: flex; margin: 0 0 15px; min-height: 29px; }
+#room.vellum-study .map-sheet h2 { font-size: clamp(27px,3vw,37px); }
+#room.vellum-study .map-sheet p { margin: 4px 0 12px; font-size: 13px; }
+.map-sheet h3 { font: 600 14px/1.4 var(--ui-font); color: var(--map-ink); margin: 13px 0 7px; }
+.map-sheet-grid { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(0,1fr); gap: 25px; }
+.map-topics { margin: 8px 0 15px; padding-left: 19px; color: var(--map-ink); }
+.map-topics li { padding: 4px 0; }
+.map-topics li::marker { color: #934726; }
+.map-check, .map-task-card {
+  border: 1px solid var(--map-line); border-radius: 7px; background: var(--map-paper); padding: 12px 15px;
+}
+#room.vellum-study .map-check p, #room.vellum-study .map-task-card p { margin-bottom: 0; }
+.map-number-grid, .map-number-links { display: flex; gap: 6px; flex-wrap: wrap; margin: 9px 0 15px; }
+.map-number-grid button { min-width: 39px; min-height: 38px; padding: 4px; }
+.map-number-links button { min-height: 33px; }
+.map-link-list { list-style: none; padding: 0; margin: 0 0 10px; }
+.map-link-list button, .map-advance {
+  border: 0; padding: 5px 0; color: #744329; background: transparent;
+  text-align: left; text-decoration: underline; text-underline-offset: .2em;
+}
+.map-advance { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; }
+.map-advance svg { width: 17px; height: 17px; flex: none; }
+.map-source { display: inline-block; margin-top: 12px; font-size: 12px; }
+.map-priority { display: flex; flex-wrap: wrap; gap: 8px; border: 1px solid var(--map-line); padding: 10px; margin: 12px 0; border-radius: 6px; min-width: 0; }
+.map-priority legend { padding: 0 5px; }
+.map-priority label { display: inline-flex; align-items: center; gap: 5px; padding: 5px 7px; border-radius: 5px; background: #e9dfc6; font-size: 12px; cursor: pointer; }
+.map-priority input { accent-color: #934726; }
+.map-personal-list { border: 1px solid var(--map-line); border-radius: 7px; }
+@media (max-width: 1100px) {
+  .map-phases { grid-template-columns: 1fr; }
+  .map-phase-head { min-height: auto; }
+  .map-phase ol { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 600px) {
+  .map-sheet-grid { grid-template-columns: 1fr; gap: 8px; }
+  .map-switch button { padding: 7px 8px; font-size: 11px; }
+  .map-phase ol, .map-phase[data-phase=core] ol, .map-personal-list { grid-template-columns: 1fr; }
+}

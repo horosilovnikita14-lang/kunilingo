@@ -1,0 +1,18 @@
+/* Decoration is attached to the same illustrated stage, never the viewport. */
+.shelf-atmosphere{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;filter:blur(.16px)}
+.fairy-wire-shadow{fill:none;stroke:#261c13;stroke-width:1.6;opacity:.28;transform:translate(.4px,.8px)}
+.fairy-wire,.bulb-lead,.pin-loop{fill:none;stroke:#6a5638;stroke-width:.75;stroke-linecap:round}
+.bulb-socket{fill:#79633f}
+.bulb-light{animation:shelf-glimmer var(--duration,9s) ease-in-out infinite;animation-delay:var(--delay)}
+.bulb-glint{fill:#fff6dc;opacity:.75}
+.pin-shadow{fill:#291b10;opacity:.4}
+.pin-head{fill:#ad8951;stroke:#5d4327;stroke-width:.5}
+.pin-slot{fill:none;stroke:#594127;stroke-width:.4;stroke-linecap:round}
+.shelf-pendant{transform-origin:0 0;animation:pendant-sway 8s ease-in-out infinite alternate;animation-delay:var(--delay)}
+.pendant-thread{fill:none;stroke:#9b825b;stroke-width:.55}
+.pendant-star{fill:#cda668;stroke:#725133;stroke-width:.65;stroke-linejoin:round}
+.pendant-fold{fill:none;stroke:#a67c46;stroke-width:.5;opacity:.7}
+@keyframes shelf-glimmer{0%,100%{opacity:.72}45%{opacity:1}70%{opacity:.86}}
+@keyframes pendant-sway{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+#room.paused .bulb-light,#room.paused .shelf-pendant{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.bulb-light,.shelf-pendant{animation:none}}

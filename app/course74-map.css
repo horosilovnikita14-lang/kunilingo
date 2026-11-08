@@ -1,0 +1,180 @@
+/* The path lives directly on the room. No translucent sheet or blurred edges. */
+#room.vellum-study[data-section=path] .study-panel:has(.course-map-view) {
+  top: 20px; bottom: 0; left: 50%; right: auto; transform: translateX(-50%);
+  width: min(600px,calc(100% - 2 * (var(--nav-w) + 22px)));
+  max-width: none; height: auto; max-height: none; padding: 14px 16px 100px;
+  border: 0; border-radius: 0; background: none; box-shadow: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  scrollbar-width: none; overscroll-behavior: contain;
+  color: #fff6e6;
+}
+#room.vellum-study[data-section=path] .study-panel:has(.course-map-view)::-webkit-scrollbar { display: none; }
+#room.vellum-study[data-section=path] .study-panel:has(.course-map-view) .study-panel-header { display: none; }
+#room.vellum-study[data-section=path] .study-panel:has(.course-map-view) h1 {
+  margin: 0; color: #fff6e6; font: 400 30px/1.2 var(--vellum-serif);
+  text-align: center; text-shadow: 0 1px 3px #252b24,0 0 12px #252b2480;
+}
+.course-map-view { color: #fff6e6; }
+.course-map-view .map-intro { justify-content: center; padding: 6px 0 34px; }
+#room.vellum-study .course-map-view .map-intro p { color: #fff6e6; font-size: 11px; text-shadow: 0 1px 3px #252b24; }
+.trail-main { max-width: 460px; margin: auto; padding: 0; }
+.trail-chapter + .trail-chapter { margin-top: 25px; }
+.trail-chapter-head {
+  position: relative; isolation: isolate;
+  width: fit-content; min-width: min(250px,100%); max-width: 100%;
+  margin: 0 auto 27px; padding: 18px 30px 20px; text-align: center;
+}
+.trail-chapter-head::before {
+  content: ''; position: absolute; z-index: -1; inset: 0 -5px;
+  background: url('./assets/title-brush77.svg') center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.trail-chapter-head > span {
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  color: #e4dec8; font: 400 10px/1.5 var(--ui-font); letter-spacing: .035em;
+  text-shadow: none;
+}
+.trail-chapter-head i { width: 2px; height: 2px; background: currentColor; border-radius: 50%; }
+#room.vellum-study .course-map-view .trail-chapter h2,
+#room.vellum-study .course-map-view .trail-finish h2 {
+  margin: 6px 0 0; color: #fff6e6; font: 400 clamp(22px,2vw,27px)/1.2 var(--vellum-serif);
+  letter-spacing: -.025em; text-wrap: balance; scroll-margin-top: 28px;
+  text-shadow: 0 1px 3px #252b24,0 0 12px #252b2480;
+}
+.course-trail-track { --trail-span: 176px; position: relative; margin: 0; }
+#room.vellum-study .course-map-view .trail-chapter-head h2 { text-shadow: none; }
+.course-trail-thread {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  width: var(--trail-span); height: 100%; overflow: visible; fill: none;
+  stroke: #f1e7cf; stroke-width: 3; stroke-dasharray: 0 11;
+  stroke-linecap: round; pointer-events: none;
+}
+.course-trail-nodes { list-style: none; margin: 0; padding: 0; }
+.course-trail-nodes li { height: 128px; position: relative; }
+.trail-stop {
+  --orb-fill: #f1e7cf; --orb-edge: #b5aa94; --orb-ink: #6d6d5d;
+  position: absolute; left: calc(50% + var(--trail-span) * var(--sway)); top: 0;
+  transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;
+  width: 190px; max-width: calc(100% - 56px); padding: 0;
+  border: 0; background: transparent; color: #3c4538; text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.trail-stop.is-next { --orb-edge: #934726; --orb-ink: #934726; }
+.trail-stop.is-active { --orb-fill: #934726; --orb-edge: #934726; --orb-ink: #fff6e6; }
+.trail-stop.is-done { --orb-fill: #657457; --orb-edge: #657457; --orb-ink: #fff6e6; }
+.trail-orb {
+  display: grid; place-items: center; position: relative;
+  width: 48px; height: 48px; box-sizing: border-box; flex: none;
+  border: 1px solid var(--orb-edge); border-radius: 50%; background: var(--orb-fill); color: var(--orb-ink);
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+.trail-orb svg { width: 21px; height: 21px; stroke-width: 1.5; }
+.trail-orb::after {
+  content: ''; position: absolute; inset: -1px; border: 1px solid #aa633c;
+  border-radius: inherit; opacity: 0; pointer-events: none;
+}
+.trail-caption { display: block; max-width: 100%; margin-top: 7px; padding: 4px 8px; border-radius: 5px; background: #f1e7cf; }
+.trail-caption strong { display: block; font: 400 12px/1.3 var(--ui-font); text-wrap: balance; }
+.trail-caption small { display: block; margin-top: 2px; color: #7a6f59; font: 400 9px/1.3 var(--ui-font); }
+.trail-stop.is-active small, .trail-stop.is-next small { color: #934726; }
+.trail-stop.is-done small { color: #526243; }
+#room.vellum-study .trail-stop:focus-visible { outline: none; }
+#room.vellum-study .trail-stop:focus-visible .trail-orb { outline: 2px solid #f1e7cf; outline-offset: 4px; }
+@media (hover:hover) {
+  .trail-stop:hover .trail-orb { background: #934726; border-color: #934726; color: #fff6e6; }
+  .trail-stop.is-done:hover .trail-orb { background: #4d6040; border-color: #4d6040; }
+}
+.trail-stop.is-opening .trail-orb { background: #ab603b; border-color: #ab603b; color: #fff6e6; transform: scale(.94); }
+.trail-stop.is-opening .trail-orb::after { animation: trail-ripple 250ms ease-out; }
+@keyframes trail-ripple { from { opacity: .5; transform: scale(1); } to { opacity: 0; transform: scale(1.65); } }
+.trail-finish { text-align: center; padding: 20px 0 30px; }
+.trail-finish > span { color: #fff6e6; font: 400 10px/1.4 var(--ui-font); text-shadow: 0 1px 3px #252b24; }
+.trail-finish-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; border: 0; border-radius: 5px; background: #f1e7cf; color: #934726; padding: 8px 12px; font: 12px/1.4 var(--ui-font); }
+.trail-finish-link:hover { background: #fff3dc; }
+.trail-finish-link svg { width: 16px; height: 16px; }
+.course-map-view .map-footer { justify-content: center; text-align: center; color: #fff6e6; padding-top: 20px; text-shadow: 0 1px 3px #252b24; }
+.course-map-view .map-footer details { text-align: left; }
+.course-map-view .map-footer a { color: #fff6e6; }
+
+/* One focused, centred lesson. Its return actions stay in view. */
+#room.vellum-study[data-section=path] .study-panel:has(.course-lesson-view) {
+  display: block;
+  top: 28px; bottom: 84px; left: 50%; right: auto; transform: translateX(-50%);
+  width: min(700px,calc(100% - 2 * (var(--nav-w) + 22px)));
+  max-width: none; max-height: none; height: auto; padding: 0 32px 30px;
+  border: 0; border-radius: 14px; background: #f5eddd; box-shadow: 0 8px 32px #171c192e;
+  scrollbar-width: thin; scrollbar-color: #b6ad98 transparent;
+}
+#room.vellum-study[data-section=path] .study-panel:has(.course-lesson-view) > .study-panel-header,
+#room.vellum-study[data-section=path] .study-panel:has(.course-lesson-view) > h1 { display: none; }
+#room.vellum-study[data-section=path] .study-panel:has(.course-lesson-view) > .study-body { display: contents; }
+.course-lesson-view { --course-card: #f5eddd; --course-border: #d7cdb9; }
+.course-nav {
+  position: sticky; top: 0; z-index: 2; display: flex; align-items: center;
+  flex-wrap: wrap; gap: 8px 14px; padding: 14px 0; margin-bottom: 25px;
+  background: #f5eddd; border-bottom: 1px solid #ddd3bf;
+}
+.course-nav button {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 4px 0;
+  border: 0; background: none; color: #7a472d; font: 500 12px/1.4 var(--ui-font); cursor: pointer;
+}
+.course-nav button:hover { color: #a55730; }
+.course-nav button svg { width: 18px; height: 18px; }
+.course-nav-context { flex: 1; text-align: center; font: 11px/1.5 var(--ui-font); color: #756e61; }
+.course-nav-context span { display: block; }
+.course-theory-back { margin-left: auto; }
+.course-lesson-view .course-page { max-width: 570px; margin: 0 auto; }
+#room.vellum-study .course-lesson-view h2 { font: 400 clamp(28px,2.6vw,36px)/1.16 var(--vellum-serif); margin: 6px 0 10px; }
+.course-lesson-view .map-label { color: #934726; font-size: 11px; font-weight: 500; letter-spacing: .06em; }
+#room.vellum-study .course-lesson-view p { color: #5d5b50; font-size: 14px; line-height: 1.75; }
+.course-lesson-view .course-reading { margin: 26px 0; }
+.course-lesson-view .course-reading section, .course-lesson-view .course-reading aside {
+  padding: 0; margin: 0 0 22px; border: 0; border-radius: 0; background: none;
+}
+.course-lesson-view .course-reading h3 { font-size: 12px; font-weight: 600; margin-bottom: 7px; color: #424b3e; }
+.course-lesson-view .course-reading .course-example { padding-left: 16px; border-left: 2px solid #c8cfb7; }
+.course-lesson-view .course-reading .course-trap { padding-left: 16px; border-left: 2px solid #c6a188; }
+.course-lesson-view .course-primary { min-height: 42px; border: 0; border-radius: 7px; padding: 10px 18px; font-weight: 500; }
+.course-lesson-view .course-secondary { min-height: 40px; border-color: #d1c4ad; border-radius: 7px; font-weight: 500; }
+.course-lesson-view .course-form { margin-top: 24px; }
+.course-lesson-view .course-form fieldset { border: 0; padding: 0; background: none; margin: 0 0 20px; }
+.course-lesson-view .course-form legend { padding: 0; font-weight: 500; line-height: 1.6; margin-bottom: 14px; }
+.course-lesson-view .course-options { gap: 8px; }
+.course-lesson-view .course-options label {
+  align-items: center; min-height: 44px; gap: 10px; padding: 8px 13px;
+  border: 1px solid #d6ccb7; border-radius: 7px; background: #faf5e9;
+}
+.course-lesson-view .course-options label:has(input:checked) { border-color: #956243; background: #eee1c9; }
+.course-lesson-view .course-feedback { border: 0; padding: 14px 16px; }
+.course-lesson-view .course-reading-text { border: 0; border-radius: 0; border-left: 2px solid #c8cfb7; background: none; padding: 4px 0 4px 16px; }
+.course-lesson-view .course-complete { padding: 35px 0 25px; text-align: center; }
+.course-complete > svg, .course-complete-mark { width: 48px; height: 48px; color: #657457; margin-bottom: 12px; }
+.course-lesson-view .course-report li { border: 0; background: #eee5d3; padding: 16px; margin-bottom: 14px; }
+.course-lesson-view .course-save-warning { color: #934726; font-size: 11px; margin-top: 20px; }
+@media (max-width: 1000px) and (min-width: 601px) {
+  #room.vellum-study[data-section=path] .study-panel:has(.course-map-view),
+  #room.vellum-study[data-section=path] .study-panel:has(.course-lesson-view) {
+    left: calc(50% + var(--nav-w) / 2); width: calc(100% - var(--nav-w) - 52px);
+  }
+  .course-trail-track { --trail-span: 144px; }
+}
+@media (max-width: 600px) {
+  #room.vellum-study[data-section=path] .study-panel:has(.course-map-view) {
+    top: var(--panel-top); bottom: 0; left: 50%; right: auto; width: calc(100% - 24px);
+    height: auto; max-height: none; padding: 16px 12px 100px;
+  }
+  #room.vellum-study[data-section=path] .study-panel:has(.course-lesson-view) {
+    top: var(--panel-top); bottom: 76px; left: 50%; right: auto; width: calc(100% - 24px);
+    height: auto; max-height: none; padding: 0 20px 24px; border-radius: 11px;
+  }
+  .course-trail-track { --trail-span: 132px; }
+  .trail-stop { width: 185px; max-width: calc(100% - 50px); }
+  .trail-caption strong { font-size: 11px; }
+  .course-nav { gap: 4px 10px; margin-bottom: 20px; }
+  .course-nav-context { order: 3; flex-basis: 100%; text-align: left; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .trail-orb { transition: none; }
+  .trail-stop.is-opening .trail-orb { transform: none; }
+  .trail-stop.is-opening .trail-orb::after { animation: none; }
+}

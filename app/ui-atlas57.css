@@ -1,0 +1,173 @@
+/* A set of printed index tabs and a two-ink chapter cover. All scene layers sit outside this scope. */
+#room.ui-study[data-look=print] {
+  --nav-w: clamp(190px, 17vw, 248px);
+  --paper: #f2e8cd;
+  --print: #233f36;
+  --brick: #91452f;
+  --tan: #eab980;
+  --nav: var(--print);
+  --nav-dim: #e4d9ba;
+  --nav-ink: var(--paper);
+  --surface: var(--paper);
+  --ink: #29382f;
+  --hint: #595c4c;
+  --edge: #c4bca1;
+  --accent: var(--brick);
+  --wash: #e4dbc1;
+  --action: var(--print);
+  --on-action: var(--paper);
+  --signal: var(--tan);
+  --glyph-accent: var(--brick);
+  --display: Georgia, "Times New Roman", serif;
+  --figures: Consolas, "Courier New", monospace;
+
+  & .paper-menu {
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  & .paper-menu-toggle {
+    padding: 10px 13px;
+    border: 1px solid #24392c;
+    border-bottom: 3px double #d8c69f;
+    background: var(--print);
+    border-radius: 2px;
+    color: var(--paper);
+  }
+  & .wordmark { font: italic 23px/1.1 var(--display); letter-spacing: -.04em; }
+  & .wordmark small { margin: 0 0 3px 1px; font: 9px/1.2 var(--figures); letter-spacing: .13em; }
+  & .brand-mark { width: 23px; }
+  & .paper-menu-links { gap: 6px; margin: 12px 0 10px; padding: 0; border: 0; }
+  & .paper-menu-item {
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: 41px 1fr auto;
+    gap: 11px;
+    width: calc(100% - 12px);
+    min-height: 56px;
+    padding: 7px 20px 7px 9px;
+    border: 0;
+    background: transparent;
+    border-radius: 0;
+    color: var(--print);
+    font: 550 17px/1.15 var(--ui-font);
+    letter-spacing: -.025em;
+    transition: width .16s ease;
+  }
+  & .paper-menu-item::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: var(--paper);
+    border-left: 4px solid var(--print);
+    clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 0 100%);
+  }
+  & .paper-menu-item:hover::before { background: #fbf3dd; }
+  & .paper-menu-item[aria-current=page] { width: 100%; }
+  & .paper-menu-item[aria-current=page]::before { background: var(--tan); border-color: var(--brick); }
+  & .paper-menu-item small { color: var(--brick); font: 12px var(--figures); align-self: start; margin-top: 5px; }
+  & .paper-menu-item:focus-visible { outline: 2px solid white; outline-offset: 1px; }
+  & .paper-menu-item .atlas-glyph { width: 34px; height: 34px; margin-left: 4px; }
+  & .atlas-glyph { fill: currentColor; stroke: none; }
+  & .atmosphere-switch {
+    width: max-content; max-width: 100%; min-height: 35px; padding: 6px 12px;
+    background: var(--print); border: 0; border-radius: 2px; color: var(--paper);
+  }
+  & .atmosphere-switch:hover { background: #355044; }
+
+  & .study-panel {
+    width: clamp(327px, 29.5vw, 432px);
+    padding: 0;
+    border: 1px solid #3a4135;
+    border-radius: 2px;
+    background: var(--paper);
+    box-shadow: 2px 3px 0 #b8ac90, 3px 4px 0 #414435, 0 8px 22px #211b1740;
+  }
+  & .study-panel > * { flex-shrink: 0; }
+  & .study-panel-header {
+    padding: 5px 10px 5px 20px;
+    border: 0;
+    min-height: 36px;
+    background: var(--paper);
+  }
+  & .study-subject { font: 600 11px var(--ui-font); color: var(--print); letter-spacing: .06em; text-transform: uppercase; }
+  & .study-close { width: 29px; height: 29px; color: var(--print); }
+  & .imprint-masthead {
+    order: 1;
+    position: relative; isolation: isolate; overflow: hidden;
+    color: var(--paper); background: var(--print);
+    padding: 17px 99px 18px 20px;
+    border-bottom: 5px solid var(--tan);
+  }
+  & .chapter-plate { display: block; margin: 0; }
+  & .chapter-plate .imprint-caption { font: 10px/1.4 var(--figures); color: #f1d6a8; text-transform: uppercase; letter-spacing: .09em; }
+  & .imprint-seal {
+    position: absolute; inset: 0 0 0 auto; width: 88px; display: grid; place-items: center;
+    background: var(--tan); color: var(--print); border-left: 4px double var(--print);
+    --glyph-accent: var(--brick);
+  }
+  & .imprint-seal .atlas-glyph { width: 64px; height: 64px; }
+  & .study-panel h1 {
+    margin: 4px 0 0; font: italic 400 clamp(38px, 3.35vw, 53px)/1.05 var(--display);
+    color: var(--paper); letter-spacing: -.05em;
+  }
+  & .study-panel h1:focus-visible { outline-color: var(--tan); }
+  & .study-body { margin: 0; padding: 22px 20px 20px; }
+  & .eyebrow, & .next-skill > small { color: var(--brick); font: 600 10px/1.4 var(--ui-font); letter-spacing: .11em; }
+  & .study-body h2 { font: 580 clamp(22px, 1.8vw, 28px)/1.14 var(--ui-font); letter-spacing: -.048em; }
+  & .route { margin: 15px 0; border-top: 2px solid var(--print); }
+  & .route-row { min-height: 53px; border-bottom: 1px solid var(--edge); gap: 14px; }
+  & .route-row::after { display: none; }
+  & .node-number {
+    width: 30px; height: auto; background: transparent; border: 0; color: var(--hint);
+    font: italic 21px/1 var(--display); border-radius: 0;
+  }
+  & .route-row.current .node-number { color: var(--brick); font-weight: bold; }
+  & .route-row.current { background: #e8dcbe; }
+  & .route-row small { color: var(--hint); }
+  & .lesson-action, & .answer-row button {
+    min-height: 42px; border-radius: 1px; border: 1px solid var(--print); box-shadow: 0 2px 0 #838875;
+  }
+  & .lesson-action svg { border-left: 1px solid #ddd6b775; width: 33px; height: 22px; padding-left: 8px; }
+  & .study-body blockquote {
+    margin: 18px 0; padding: 13px 1px; border: 0;
+    border-block: 1px solid var(--print); background: transparent; font: italic 22px/1.35 var(--display);
+    letter-spacing: -.025em;
+  }
+  & .gap { border-bottom: 1px dashed var(--brick); }
+  & .answer-row { gap: 0; }
+  & .answer-row button + button { border-left: 0; }
+  & .answer-row button[aria-pressed=true] { background: var(--print); }
+  & .skill-index { font: italic 32px/1 var(--display); }
+  & .skill-rule { gap: 4px; }
+  & .skill-rule i { height: 16px; transform: skewX(-13deg); background: transparent; border: 1px solid var(--edge); }
+  & .skill-rule i:first-child { background: var(--brick); border-color: var(--brick); }
+  & .evidence { border-top: 2px solid var(--print); }
+  & .dock, & .timeline-panel { border-radius: 2px; }
+}
+.review-choices [data-look=print] i {
+  background: linear-gradient(125deg, #eab980 48%, #233f36 49%); border-radius: 1px;
+}
+@media (max-width: 600px) {
+  #room.ui-study[data-look=print] {
+    --nav-w: calc(100% - 20px);
+    & .paper-menu-toggle { width: 100%; height: 39px; padding: 3px 49px 3px 8px; }
+    & .wordmark { font-size: 20px; }
+    & .paper-menu-links { gap: 4px; margin: 5px 0 0; }
+    & .paper-menu-item { display: flex; width: 100%; gap: 3px; min-height: 41px; padding: 3px; font-size: 13px; }
+    & .paper-menu-item::before { border-width: 2px; }
+    & .paper-menu-item .atlas-glyph { width: 22px; height: 22px; margin: 0; }
+    & .atmosphere-switch { top: 2px; right: 3px; width: 36px; padding: 0; border-left: 1px solid #d8c69f70; }
+    & .study-panel { width: min(360px, calc(100% - 20px)); top: 111px; max-height: calc(100% - 212px); }
+    & .study-body { padding: 16px; }
+    & .imprint-masthead { padding: 12px 80px 12px 16px; }
+    & .imprint-seal { width: 68px; }
+    & .imprint-seal .atlas-glyph { width: 50px; height: 50px; }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #room.ui-study[data-look=print] .paper-menu-item { transition: none; }
+}

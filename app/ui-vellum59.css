@@ -1,0 +1,214 @@
+/* Stable tab hit areas; one opaque surface changes colour and length together. */
+#room.ui-study.vellum-study {
+  --rust: #934726;
+  --tab-letter: #fff6e6;
+  --vellum-ink: #323b42;
+  --vellum-serif: Georgia, "Times New Roman", serif;
+  --nav-w: clamp(184px, 16.5vw, 260px);
+  --signature-height: clamp(70px, 5.8vw, 88px);
+  --nav-top: max(12px, env(safe-area-inset-top));
+  --ink: var(--vellum-ink);
+  --hint: #4e5354;
+  --edge: #bfbaac;
+  --accent: #485562;
+  --wash: #eae3d3;
+  --action: #455461;
+  --on-action: #fffbeb;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23766b50' opacity='.09' filter='url(%23g)' d='M0 0h96v96H0z'/%3E%3C/svg%3E");
+  --study-glass-fill:linear-gradient(130deg,#fff3d826,#eaf0f00b 48%,#ccb89a20);
+  --study-glass-shadow:inset -2px -3px 6px #382c2824,inset -1px 2px 4px #fff9e147,2px 4px 10px #26221d21;
+  --study-glass-filter:blur(3px) saturate(1.08);
+}
+
+#room.vellum-study .paper-menu {
+  top: var(--nav-top);
+  left: max(0px, env(safe-area-inset-left));
+  width: var(--nav-w); padding: 0; background: transparent; border: 0; box-shadow: none;
+}
+#room.vellum-study .paper-menu > .menu-glass-defs {
+  position: absolute; width: 0; height: 0; pointer-events: none;
+}
+#room.vellum-study .paper-menu.has-glass {
+  width: max-content;
+  max-width: calc(100% - 10px - env(safe-area-inset-left) - env(safe-area-inset-right));
+}
+#room.vellum-study .paper-menu.has-glass::before {
+  content: "";
+  position: absolute; z-index: -1; pointer-events: none;
+  /* The controls keep their natural height. Only the glass spans the viewport. */
+  inset: calc(0px - var(--nav-top)) -9px auto 0;
+  height: 100vh;
+  height: 100dvh;
+  background:var(--study-glass-fill);
+  box-shadow:var(--study-glass-shadow);
+  -webkit-backdrop-filter: blur(3px) saturate(1.08);
+  backdrop-filter:var(--study-glass-filter);
+}
+@supports (backdrop-filter: url("#vellum-lens") blur(2px)) {
+  #room.ui-study.vellum-study {--study-glass-filter:url("#vellum-lens") blur(2px) saturate(1.08);}
+  #room.vellum-study .paper-menu.has-glass::before {
+    backdrop-filter: url("#vellum-lens") blur(2px) saturate(1.08);
+  }
+}
+@media (min-width: 601px) {
+  #room.vellum-study .paper-menu.has-glass .paper-menu-links { width: var(--nav-w); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  #room.ui-study.vellum-study {--study-glass-fill:#d6cbb7;--study-glass-filter:none;--study-glass-shadow:none;}
+  #room.vellum-study .paper-menu.has-glass::before {
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+    background: #d6cbb7; box-shadow: none;
+  }
+}
+#room.vellum-study .vellum-signature {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: center; gap: 9px;
+  width: max-content; max-width: calc(var(--nav-w) + 36px); min-height: var(--signature-height);
+  padding: 6px 32px 8px 16px; box-sizing: border-box;
+  color: #fff3d8;
+  font: italic 500 clamp(30px, 2.65vw, 42px)/1.1 var(--vellum-serif); letter-spacing: -.045em;
+}
+#room.vellum-study .vellum-signature::before {
+  content: ""; position: absolute; inset: 0 0 0 -20px; z-index: -1; pointer-events: none;
+  background: #394331;
+  border-radius: 0 11px 20px 0;
+  transform: skewX(-12deg); transform-origin: right top;
+}
+#room.vellum-study .vellum-signature svg {
+  flex: none; width: clamp(26px, 2.1vw, 34px); height: auto; color: #edc496;
+  fill: none; stroke: none;
+}
+#room.vellum-study .paper-menu-links {
+  position: relative;
+  display: grid; grid-template-columns: 1fr; gap: 8px;
+  margin: 0; padding: 13px 0 10px; border: 0;
+}
+#room.vellum-study .paper-menu-item {
+  --tab-width: 94%;
+  --tab-fill: #f1e7cf;
+  --tab-motion: .2s cubic-bezier(.2, .7, .3, 1);
+  position: relative; isolation: isolate;
+  display: flex; align-items: center; justify-content: flex-start;
+  width: 100%; min-height: clamp(55px, 4.4vw, 69px); margin: 0; padding: 9px 21px 9px 23px;
+  border: 0; border-radius: 0 99px 99px 0;
+  background: transparent; box-shadow: none;
+  gap: clamp(10px, 1vw, 17px); color: var(--vellum-ink);
+  font: 500 clamp(20px, 1.55vw, 26px)/1.12 var(--vellum-serif);
+  transition: color var(--tab-motion);
+}
+#room.vellum-study .paper-menu-item::before {
+  content: ''; display: block; position: absolute; inset: 0 auto 0 0;
+  width: var(--tab-width); height: auto; margin: 0; border: 0; border-radius: inherit;
+  z-index: -1; pointer-events: none;
+  background-image: var(--grain); background-color: var(--tab-fill);
+  box-shadow: none;
+  transition: width var(--tab-motion), background-color var(--tab-motion);
+}
+#room.vellum-study .paper-menu-item::after {
+  content: none;
+}
+#room.vellum-study .paper-menu-item[aria-current=page] {
+  --tab-width: 100%; --tab-fill: var(--rust);
+  color: var(--tab-letter);
+}
+/* Preview the selected appearance without changing the current section. */
+@media (hover: hover) and (pointer: fine) {
+  #room.vellum-study .paper-menu-item:not([aria-current=page]):hover {
+    --tab-width: 100%; --tab-fill: var(--rust);
+    color: var(--tab-letter);
+  }
+}
+#room.vellum-study .paper-menu-item small { display: none; }
+#room.vellum-study .paper-menu-item svg.vellum-icon {
+  width: clamp(25px, 1.9vw, 30px); height: auto; flex: none; fill: currentColor; stroke: none;
+}
+#room.vellum-study .paper-menu-item:focus-visible {
+  outline: 2px solid #30271e; outline-offset: -4px;
+}
+#room.vellum-study .paper-menu-item:focus-visible span { text-decoration: underline; text-underline-offset: .18em; }
+
+#room.vellum-study .study-panel {
+  top: max(15px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  width: clamp(302px, 26vw, 420px); padding: 0 8px 9px;
+  background: var(--grain), rgba(221,190,162,.93);
+  border: 2px solid var(--rust); border-radius: 9px 10px 6px 7px;
+  box-shadow: 3px 4px 0 #7d472d55, 0 5px 16px #24252936;
+  font-family: var(--vellum-serif);
+}
+#room.vellum-study .study-panel > * { flex-shrink: 0; }
+#room.vellum-study .study-panel-header {
+  min-height: 39px; margin: 0; padding: 3px 3px 3px 15px; border: 0;
+}
+#room.vellum-study .study-subject { font: 500 clamp(16px, 1.2vw, 20px)/1.3 var(--vellum-serif); color: #262f35; }
+#room.vellum-study .study-close { color: #36424b; background: transparent; }
+#room.vellum-study .study-close:hover { background: #e2e4da8c; }
+#room.vellum-study .chapter-plate { display: none; }
+#room.vellum-study .study-panel h1,
+#room.vellum-study .study-body { background: var(--grain), #f1e6d0; color: var(--vellum-ink); }
+#room.vellum-study .study-panel h1 {
+  border-radius: 5px 5px 0 0; padding: 15px 17px 6px;
+  font: 650 clamp(28px, 2.35vw, 40px)/1.15 var(--vellum-serif); letter-spacing: -.025em;
+}
+#room.vellum-study .study-body { margin: 0; padding: 12px 17px 20px; border-radius: 0 0 4px 4px; }
+#room.vellum-study .study-body h2 { font: 550 clamp(19px, 1.55vw, 26px)/1.25 var(--vellum-serif); letter-spacing: -.02em; }
+#room.vellum-study .study-body blockquote {
+  background: none; border: 0; color: var(--vellum-ink); padding: 0;
+  margin: 15px 0 20px; font: italic clamp(18px, 1.45vw, 24px)/1.4 var(--vellum-serif);
+}
+#room.vellum-study .answer-row { gap: clamp(12px, 1.5vw, 27px); }
+#room.vellum-study .answer-row button {
+  color: var(--vellum-ink); border: 1.5px solid #47515a; border-radius: 8px; background: transparent;
+  font: 500 20px/1.1 var(--vellum-serif); min-height: 42px;
+}
+#room.vellum-study .answer-row button:hover { background: #faf2df; }
+#room.vellum-study .answer-row button[aria-pressed=true] { background: #485866; color: #fff6e6; }
+#room.vellum-study .route, #room.vellum-study .lesson-action,
+#room.vellum-study .study-body .lead, #room.vellum-study .study-body .answer-note,
+#room.vellum-study .study-body .next-skill, #room.vellum-study .explain { font-family: var(--ui-font); }
+#room.vellum-study .study-body .eyebrow { font: 600 11px/1.4 var(--ui-font); color: #5a605f; }
+#room.vellum-study .review-strip { gap: 8px; }
+.vellum-tools { display: flex; align-items: center; gap: 4px; }
+#room.vellum-study .vellum-tools button {
+  position: static; width: auto; min-height: 36px; border: 0; border-radius: 4px;
+  display: inline-flex; justify-content: center; align-items: center; gap: 5px; margin: 0; padding: 6px;
+  background: transparent; color: #eee9d9; font: 500 12px/1.2 var(--ui-font); cursor: pointer;
+}
+#room.vellum-study .vellum-tools button:hover { background: #525b51; }
+#room.vellum-study .vellum-tools button[aria-pressed=true] { color: #efcc99; background: #41483f; }
+#room.vellum-study .vellum-tools svg { width: 16px; height: 16px; }
+@media (max-width: 600px) {
+  #room.vellum-study {
+    --signature-height: 50px;
+    --nav-top: max(6px, env(safe-area-inset-top));
+    --panel-top: calc(var(--nav-top) + var(--signature-height) + 65px);
+  }
+  #room.vellum-study:has(.paper-menu-links[hidden]) {
+    --panel-top: calc(var(--nav-top) + var(--signature-height) + 8px);
+  }
+  #room.vellum-study .paper-menu { width: 100%; top: var(--nav-top); }
+  #room.vellum-study .vellum-signature { padding: 4px 25px 5px 13px; font-size: 27px; }
+  #room.vellum-study .paper-menu-links {
+    display: flex; gap: 3px; width: max-content; max-width: 100%; padding: 6px 5px 0 3px;
+  }
+  #room.vellum-study .paper-menu-item:nth-child(n) {
+    width: auto; gap: 5px; padding: 7px clamp(5px, 2vw, 12px); min-height: 50px;
+    border-radius: 5px 25px 25px 5px; font-size: clamp(14px, 3.9vw, 19px);
+  }
+  #room.vellum-study .paper-menu-item[aria-current=page] { font-weight: 700; }
+  #room.vellum-study .paper-menu-item svg.vellum-icon { width: 21px; }
+  #room.vellum-study .study-panel {
+    z-index: 2;
+    top: var(--panel-top); right: 10px; width: min(320px, calc(100% - 20px));
+    max-height: calc(100% - var(--panel-top) - 112px);
+  }
+  #room.vellum-study .review-strip { gap: 2px 4px; padding: 4px 6px; }
+  #room.vellum-study .vellum-tools span { display: none; }
+}
+@media (max-width: 600px) and (hover: none) {
+  #room.vellum-study .paper-menu-item { --tab-width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #room.vellum-study .paper-menu-item,
+  #room.vellum-study .paper-menu-item::before { transition: none; }
+}

@@ -1,0 +1,13 @@
+{
+  "name":"kunilingo-site",
+  "private":true,
+  "type":"module",
+  "engines":{"node":">=24.5.0 <25"},
+  "scripts":{
+    "build":"node build.mjs",
+    "dev":"node scripts/preview98.mjs",
+    "start":"node scripts/preview98.mjs",
+    "test":"node --test worker.test.mjs sessions97.test.mjs routing97.test.mjs pencil98.test.mjs pencil98-geometry.test.mjs guides100.test.mjs topics100.test.mjs"
+  },
+  "devDependencies":{"happy-dom":"21.0.4"}
+}
