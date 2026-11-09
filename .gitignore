@@ -6,7 +6,9 @@ node_modules/
 dist/
 .openai/
 .vercel/
+.local-data/
 work/
 *.log
 .DS_Store
 Thumbs.db
+.local-data/

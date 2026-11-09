@@ -1,0 +1,45 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createServer} from 'node:net';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {resolve,relative,isAbsolute} from 'node:path';
+import {createPreviewServer} from './scripts/preview98.mjs';
+
+test('the real local HTTP server joins accounts, persistent progress, feedback and the existing exercise API',async t=>{
+  const reservation=createServer();await new Promise(resolve=>reservation.listen(0,'127.0.0.1',resolve));
+  const port=reservation.address().port;await new Promise(resolve=>reservation.close(resolve));
+  const temporaryRoot=resolve(tmpdir()),directory=await mkdtemp(resolve(temporaryRoot,'kunilingo-http102-'));
+  let app=createPreviewServer({port,dataDirectory:directory});
+  const start=()=>new Promise((resolve,reject)=>{app.server.once('error',reject);app.server.listen(port,app.host,resolve);});
+  const stop=()=>new Promise((resolve,reject)=>{app.server.closeAllConnections();app.server.close(error=>error?reject(error):resolve());});
+  await start();
+  t.after(async()=>{if(app.server.listening)await stop();const part=relative(temporaryRoot,resolve(directory));assert.ok(part.startsWith('kunilingo-http102-')&&!part.startsWith('..')&&!isAbsolute(part));await rm(directory,{recursive:true,force:true});});
+  const call=async(path,{method='GET',body,cookie,user='guest'}={})=>{
+    const response=await fetch(app.origin+path,{method,headers:{Connection:'close','X-KuniLingo-User':user,...(method==='GET'?{}:{Origin:app.origin}),...(body===undefined?{}:{'Content-Type':'application/json'}),...(cookie?{Cookie:cookie}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})}).catch(cause=>{throw new Error('HTTP request failed: '+path,{cause});});
+    const data=await response.json();return {response,data,cookie:response.headers.get('set-cookie')?.split(';')[0]};
+  };
+  assert.equal((await call('/api/beta/session')).data.user,null);
+  const owner=await call('/api/beta/register',{method:'POST',body:{username:'local_owner',password:'strong test password'}});
+  assert.equal(owner.response.status,201);assert.equal(owner.data.user.role,'owner');assert.match(owner.response.headers.get('set-cookie'),/HttpOnly/);
+  const profile={cookie:owner.cookie,user:owner.data.user.id};
+  const records={'kunilingo.practice84':{drafts:{B00002:'ы'.repeat(70000)},work:{B00002:{visited:true}}}};
+  const saved=await call('/api/beta/progress',{...profile,method:'PUT',body:{revision:0,records}});
+  assert.equal(saved.response.status,200);assert.equal(saved.data.revision,1);
+  const guest=await call('/api/beta/feedback',{method:'POST',body:{category:'bug',message:'Не работает кнопка в задании',context:{section:'practice',exerciseId:'B00002'}}});
+  assert.equal(guest.response.status,201);
+  const queue=await call('/api/beta/admin/feedback',profile);assert.equal(queue.data.items[0].id,guest.data.feedback.id);
+  const changed=await call('/api/beta/admin/feedback/'+guest.data.feedback.id,{...profile,method:'PATCH',body:{status:'resolved'}});assert.equal(changed.data.feedback.status,'resolved');
+  const learner=await call('/api/beta/register',{method:'POST',body:{username:'local_learner',password:'another strong password'}});
+  assert.equal(learner.data.user.role,'learner');
+  assert.equal((await call('/api/beta/admin/feedback',{cookie:learner.cookie,user:learner.data.user.id})).response.status,403);
+  assert.deepEqual((await call('/api/beta/progress',{cookie:learner.cookie,user:learner.data.user.id})).data.records,{});
+  assert.equal((await call('/api/beta/progress',{cookie:learner.cookie,user:owner.data.user.id})).data.error.code,'session_changed');
+  const catalog=await call('/api/fipi/catalog');assert.equal(catalog.data.total,2795);assert.ok(catalog.data.items.every(item=>!Object.hasOwn(item,'answer')));
+  assert.equal((await fetch(app.origin+'/.local-data/beta102.sqlite',{headers:{Connection:'close'}})).status,403);
+  assert.equal((await fetch(app.origin+'/scripts/beta102-api.mjs',{headers:{Connection:'close'}})).status,404);
+  assert.equal((await fetch(app.origin+'/design102.html',{headers:{Connection:'close'}})).status,200);
+  await stop();app=createPreviewServer({port,dataDirectory:directory});await start();
+  const restored=await call('/api/beta/progress',profile);assert.equal(restored.data.revision,1);assert.deepEqual(restored.data.records,records);
+  assert.equal((await call('/api/beta/admin/feedback',profile)).data.items[0].status,'resolved');
+});

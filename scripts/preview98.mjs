@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {getCACertificates, setDefaultCACertificates} from 'node:tls';
 import {Readable} from 'node:stream';
 import worker from '../dist/server/index.js';
+import {createBetaApi102} from './beta102-api.mjs';
 
 // The public GlobalSign intermediate completes FIPI's TLS chain. Normal CA
 // and hostname checks remain enabled, as in the existing Vercel adapter.
@@ -59,9 +60,9 @@ function sendError(req, res, status, message, headers = {}) {
   res.end(req.method === 'HEAD' ? undefined : body);
 }
 
-function readBody(req, signal) {
+function readBody(req, signal, limit=bodyLimit) {
   const advertised = req.headers['content-length'];
-  if (advertised && (!/^\d+$/.test(advertised) || Number(advertised) > bodyLimit)) {
+  if (advertised && (!/^\d+$/.test(advertised) || Number(advertised) > limit)) {
     req.resume();
     return Promise.reject(new PreviewError(413, 'Запрос слишком большой'));
   }
@@ -84,7 +85,7 @@ function readBody(req, signal) {
     };
     const data = chunk => {
       length += chunk.length;
-      if (length > bodyLimit) {
+      if (length > limit) {
         cleanup();
         req.resume();
         reject(new PreviewError(413, 'Запрос слишком большой'));
@@ -115,9 +116,10 @@ function timed(operation, duration, controller) {
   return Promise.race([operation, timeout]).finally(() => clearTimeout(timer));
 }
 
-export function createPreviewServer({port = Number(process.env.PORT || 4197)} = {}) {
+export function createPreviewServer({port = Number(process.env.PORT || 4197),dataDirectory,betaApi} = {}) {
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid local port');
   const origin = 'http://127.0.0.1:' + port;
+  const beta=betaApi||createBetaApi102({origin,...(dataDirectory?{dataDirectory}:{})});
   let activeApi = 0;
   const server = createServer({
     maxHeaderSize: 16 * 1024,
@@ -140,7 +142,7 @@ export function createPreviewServer({port = Number(process.env.PORT || 4197)} = 
       }
 
       if (pathname.startsWith('/api/')) {
-        if (!/^\/api\/fipi\/(?:catalog|question|check)$/.test(pathname)) throw new PreviewError(404, 'Не найдено');
+        if (!/^\/api\/fipi\/(?:catalog|question|check)$/.test(pathname)&&!pathname.startsWith('/api/beta/')) throw new PreviewError(404, 'Не найдено');
         if (activeApi >= apiLimit) { req.resume(); sendError(req, res, 503, 'Слишком много запросов. Попробуй ещё раз.', {'Retry-After': '1'}); return; }
         activeApi++;
         const controller = new AbortController();
@@ -148,7 +150,8 @@ export function createPreviewServer({port = Number(process.env.PORT || 4197)} = 
         req.once('aborted', abort);
         try {
           const started = Date.now();
-          const body = await timed(readBody(req, controller.signal), 15000, controller);
+          const limit=pathname==='/api/beta/progress'?9*1024*1024:bodyLimit;
+          const body = await timed(readBody(req, controller.signal,limit), 15000, controller);
           if ((req.method === 'GET' || req.method === 'HEAD') && body.length) throw new PreviewError(400, 'Некорректный запрос');
           const headers = new Headers();
           for (const [name, value] of Object.entries(req.headers)) {
@@ -160,7 +163,8 @@ export function createPreviewServer({port = Number(process.env.PORT || 4197)} = 
             signal: controller.signal,
             ...(body.length ? {body} : {}),
           });
-          const response = await timed(worker.fetch(request, {}), Math.max(1, 20000 - (Date.now() - started)), controller);
+          const response = await timed(pathname.startsWith('/api/beta/')?beta.fetch(request):worker.fetch(request, {}), Math.max(1, 20000 - (Date.now() - started)), controller);
+          if(!response)throw new PreviewError(404,'Не найдено');
           if (res.destroyed || res.writableEnded) return;
           const responseHeaders = Object.fromEntries(response.headers);
           responseHeaders['X-Content-Type-Options'] = 'nosniff';
@@ -215,6 +219,7 @@ export function createPreviewServer({port = Number(process.env.PORT || 4197)} = 
   server.maxHeadersCount = 64;
   server.maxRequestsPerSocket = 100;
   server.setTimeout(25000, socket => socket.destroy());
+  server.once('close',()=>beta.close?.());
   return {server, port, host: '127.0.0.1', origin};
 }
 

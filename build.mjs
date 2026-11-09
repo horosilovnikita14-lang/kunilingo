@@ -2,6 +2,8 @@ import {readFile,writeFile,mkdir,cp,readdir} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {createHash} from 'node:crypto';
 import {applyTopicReviews100} from './server-source/topics100.mjs';
+import {prepareTopicCoverage101} from './server-source/topic-preparation101.mjs';
+import {articleIds101} from './app/study101-registry.js';
 const root=process.cwd(),read=p=>readFile(resolve(root,p),'utf8');
 await mkdir('dist/client',{recursive:true});await mkdir('dist/server',{recursive:true});
 for(const item of await readdir('app',{withFileTypes:true}))if(item.isFile()&&/\.(js|css|html)$/.test(item.name))await cp('app/'+item.name,'dist/client/'+item.name);
@@ -11,6 +13,9 @@ html=html.replace('<head>','<head><meta name="robots" content="noindex,nofollow"
 await writeFile('dist/client/index.html',html);await writeFile('dist/client/robots.txt','User-agent: *\nDisallow: /\n');
 const reviewed=applyTopicReviews100({archive:JSON.parse(await read('server-source/questions.json')),catalog:JSON.parse(await read('server-source/catalog.json')),bank:JSON.parse(await read('server-source/bank-snapshot.json')).items,reviews:JSON.parse(await read('server-source/topic-reviews100.json'))});
 const {archive,catalog:bankCatalog,bank:bankSnapshot}=reviewed;
+const topicCoverage=prepareTopicCoverage101({bank:bankSnapshot,archive,articleIds:articleIds101});
+await mkdir('dist/reports',{recursive:true});
+await writeFile('dist/reports/topic-coverage101.json',JSON.stringify(topicCoverage,null,2)+'\n');
 const answers=(await read('app/practice87-answer.js')).replaceAll('export ','');
 const source=await read('server-source/fipi84-source.mjs');
 const constants=source.slice(source.indexOf('export const project='),source.indexOf('export async function sourceRequest')).replaceAll('export ','');

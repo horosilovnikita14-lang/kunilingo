@@ -14,9 +14,11 @@ const key='kunilingo.practice84',pageSize=12;
 const countLabel=n=>n+' '+(n%100>=11&&n%100<=14?'заданий':n%10===1?'задание':n%10>=2&&n%10<=4?'задания':'заданий');
 const button=(action,label,attrs='')=>'<button type="button" data-practice="'+action+'" '+attrs+'>'+label+'</button>';
 const option=(value,label,selected)=>'<option value="'+esc(value)+'" '+(String(selected)===String(value)?'selected':'')+'>'+esc(label)+'</option>';
-export function createPractice({root,panel,body,heading}){
+export function createPractice({root,panel,body,heading,storage=globalThis.localStorage}){
+  const listeners=new AbortController();let destroyed=false;
+  const listen=(target,type,handler)=>target?.addEventListener?.(type,handler,{signal:listeners.signal});
   const record=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
-  let saved={};try{saved=record(JSON.parse(localStorage.getItem(key)||'{}'));}catch{}
+  let saved={};try{saved=record(JSON.parse(storage.getItem(key)||'{}'));}catch{}
   let filters=cleanFilters(record(saved.filters)),applied=null;
   const drafts=record(saved.drafts),work=record(saved.work);
   const pages=createPageTransition(body);
@@ -26,14 +28,14 @@ export function createPractice({root,panel,body,heading}){
   let railOpen=!globalThis.matchMedia?.('(max-width:1050px)').matches;
   const rail=document.createElement('aside');rail.className='practice-rail';rail.setAttribute('aria-label','Фильтры практики');rail.hidden=true;root.append(rail);
   const guideRail=createGuideRail100(rail);
-  const save=()=>{try{localStorage.setItem(key,JSON.stringify({filters,drafts,work}));}catch{}};
+  const save=()=>{if(destroyed)return;try{storage.setItem(key,JSON.stringify({filters,drafts,work}));}catch{}};
   const matches=(f=filters)=>data?selectQuestions(data.items,f):[];
   function wake(){
     if(!active||!data||root.dataset.section!=='practice'||root.dataset.practiceReveal==='leaving')return;
     cancelAnimationFrame(frame);
     const check=()=>{if(!active||root.dataset.section!=='practice'||root.dataset.practiceReveal==='leaving')return;if((cameraFor(root)?.journeyProgress(performance.now())??1)<.75){frame=requestAnimationFrame(check);return;}root.dataset.practiceReveal='ready';panel.inert=false;frame=0;};frame=requestAnimationFrame(check);
   }
-  root.addEventListener('camera-start',()=>{if(active){root.dataset.practiceReveal='waiting';wake();}});root.addEventListener('camera-settled',wake);
+  listen(root,'camera-start',()=>{if(active){root.dataset.practiceReveal='waiting';wake();}});listen(root,'camera-settled',wake);
   const load=()=>loadPromise??=fetch('./api/fipi/catalog',{signal:AbortSignal.timeout(12000)}).then(r=>{if(!r.ok)throw new Error();return r.json();}).then(v=>{if(!Array.isArray(v.items)||v.items.length!==v.total)throw new Error();return data=v;}).catch(e=>{loadPromise=null;throw e;});
   function topicTree(nodes){
     return nodes.map(node=>{
@@ -94,7 +96,7 @@ export function createPractice({root,panel,body,heading}){
     else if(data)body.innerHTML=resultsView();
     enhanceControls(body);
     if(screen==='question')guideRail.show(current);else guideRail.restore();
-    if(screen==='question')pencil=mountPencil({container:body,questionId:current.id,sessions:pencilSessions});
+    if(screen==='question')pencil=mountPencil({container:body,questionId:current.id,sessions:pencilSessions,storage});
     if(resetScroll)panel.scrollTop=0;
   }
   async function openQuestion(id){
@@ -123,8 +125,8 @@ export function createPractice({root,panel,body,heading}){
     else if(action==='prev'||action==='next'){pages.change(()=>{page+=action==='next'?1:-1;render(true,false);});}
     else if(action==='retry-question')openQuestion(current.id);else if(action==='retry')show();
   }
-  body.addEventListener('click',click);rail.addEventListener('click',click);
-  rail.addEventListener('change',event=>{
+  listen(body,'click',click);listen(rail,'click',click);
+  listen(rail,'change',event=>{
     const el=event.target;
     if(el.name==='section'){filters=cleanFilters({...filters,section:el.value,task:0,topics:[]});sidebar();}
     else if(el.name==='task'){filters=cleanFilters({...filters,task:el.value,topics:[]});sidebar(true);}
@@ -132,10 +134,10 @@ export function createPractice({root,panel,body,heading}){
     else if(el.name==='topic'){filters.topics=el.checked?[...new Set([...filters.topics,el.value])]:filters.topics.filter(id=>id!==el.value);const count=rail.querySelector('[data-match-count]');if(count)count.textContent=matches().length;}
     save();
   });
-  rail.addEventListener('input',event=>{if(event.target.name==='query'){filters.query=event.target.value;const count=rail.querySelector('[data-match-count]');if(count)count.textContent=matches().length;}});
-  rail.addEventListener('submit',event=>{event.preventDefault();if(active&&data)apply();});
-  body.addEventListener('input',event=>{if(active&&screen==='question'&&event.target.name==='answer'){drafts[current.id]=event.target.value;work[current.id]={...work[current.id],visited:true,lastStatus:'draft'};save();}});
-  body.addEventListener('submit',async event=>{
+  listen(rail,'input',event=>{if(event.target.name==='query'){filters.query=event.target.value;const count=rail.querySelector('[data-match-count]');if(count)count.textContent=matches().length;}});
+  listen(rail,'submit',event=>{event.preventDefault();if(active&&data)apply();});
+  listen(body,'input',event=>{if(active&&screen==='question'&&event.target.name==='answer'){drafts[current.id]=event.target.value;work[current.id]={...work[current.id],visited:true,lastStatus:'draft'};save();}});
+  listen(body,'submit',async event=>{
     if(!active||!event.target.hasAttribute('data-practice-answer'))return;event.preventDefault();if(checking)return;
     const id=current.id,ticket=generation,answer=String(new FormData(event.target).get('answer')||'');drafts[id]=answer;save();
     if(current.mode==='essay'){status='Черновик сохранён. Сочинение нужно проверить по критериям.';body.querySelector('.practice-answer-status').textContent=status;return;}
@@ -148,5 +150,5 @@ export function createPractice({root,panel,body,heading}){
   });
   async function show(){if(active&&data){render();wake();return;}active=true;error='';root.dataset.practiceReveal='waiting';rail.hidden=false;render();try{await load();if(active&&root.dataset.section==='practice'){render();wake();}}catch(e){if(active){error=e.name==='TimeoutError'?'Загрузка списка заданий заняла слишком много времени. Попробуй ещё раз.':'Не удалось загрузить задания. Попробуй ещё раз.';render();root.dataset.practiceReveal='ready';}}}
   function leave(){if(!active)return;pencil?.destroy();pencil=null;pages.cancel();active=false;generation++;checking=false;if(screen==='loading')screen=applied?'catalog':'idle';cancelAnimationFrame(frame);rail.hidden=true;save();}
-  return {show,leave,mountStyles(){return new Promise(resolve=>{const link=document.createElement('link');link.rel='stylesheet';link.href='./practice84.css';link.onload=link.onerror=resolve;document.head.append(link);});}};
+  return {show,leave,async open(id){await show();if(active&&data?.items.some(item=>item.id===id))await openQuestion(id);},getContext(){return {section:'practice',...(screen==='question'&&current?.id?{exerciseId:current.id}:{})};},destroy(){if(destroyed)return;leave();destroyed=true;generation++;listeners.abort();pencil?.destroy();pencil=null;pages.cancel();guideRail.restore();rail.remove();questionCache.clear();pencilSessions.clear();},mountStyles(){return new Promise(resolve=>{const link=document.createElement('link');link.rel='stylesheet';link.href='./practice84.css';link.onload=link.onerror=resolve;document.head.append(link);});}};
 }

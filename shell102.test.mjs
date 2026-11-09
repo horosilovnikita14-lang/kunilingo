@@ -1,0 +1,54 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile,mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {resolve,relative,isAbsolute} from 'node:path';
+import {Window} from 'happy-dom';
+import {createBetaApi102} from './scripts/beta102-api.mjs';
+import {getStudySync} from './app/beta102-storage.js';
+
+test('the actual study shell supports guest work, explicit import, account progress, feedback and logout together',async t=>{
+  const origin='http://127.0.0.1:4197',temporaryRoot=resolve(tmpdir()),directory=await mkdtemp(resolve(temporaryRoot,'kunilingo-shell102-'));
+  const api=createBetaApi102({dataDirectory:directory,origin});
+  const window=new Window({url:origin+'/?ui=59&style=copper#/russian/progress',settings:{enableJavaScriptEvaluation:false,enableCSSFileLoading:false,enableImageFileLoading:false,enableIframePageLoading:false}}),old=new Map();
+  window.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','');};window.HTMLDialogElement.prototype.close=function(){this.removeAttribute('open');};
+  window.document.documentElement.innerHTML=await readFile(new URL('./app/index.html',import.meta.url),'utf8');
+  const root=window.document.querySelector('#room');root.dataset.section='progress';
+  window.localStorage.setItem('kunilingo.practice84',JSON.stringify({work:{B00002:{visited:true,lastStatus:'incorrect'}},drafts:{B00002:'guest answer'}}));
+  const install=(key,value)=>{old.set(key,Object.getOwnPropertyDescriptor(globalThis,key));Object.defineProperty(globalThis,key,{value,configurable:true,writable:true});};
+  const fakeRaf=callback=>setTimeout(()=>callback(performance.now()),0);
+  for(const [key,value]of Object.entries({window,document:window.document,location:window.location,history:window.history,localStorage:window.localStorage,MutationObserver:window.MutationObserver,Event:window.Event,CustomEvent:window.CustomEvent,FormData:window.FormData,getComputedStyle:window.getComputedStyle.bind(window),matchMedia:()=>({matches:true}),ResizeObserver:class{observe(){}disconnect(){}},requestAnimationFrame:fakeRaf,cancelAnimationFrame:clearTimeout,addEventListener:window.addEventListener.bind(window),removeEventListener:window.removeEventListener.bind(window),innerWidth:1280,innerHeight:800}))install(key,value);
+  let cookie='';
+  install('fetch',async(path,options={})=>{
+    const url=new URL(String(path),origin);
+    if(url.pathname==='/api/fipi/catalog')return Response.json({total:1,items:[{id:'B00002',task:16,tags:[],codes:[]}]});
+    const headers=new Headers(options.headers);if(cookie)headers.set('Cookie',cookie);if(options.method&&options.method!=='GET')headers.set('Origin',origin);
+    const response=await api.fetch(new Request(url,{...options,headers}));assert.ok(response,url.pathname);
+    const received=response.headers.get('set-cookie');if(received)cookie=received.split(';')[0];return response;
+  });
+  const loaded=new WeakSet(),styles=new window.MutationObserver(()=>{for(const sheet of window.document.head.querySelectorAll('link[rel=stylesheet]'))if(!loaded.has(sheet)){loaded.add(sheet);queueMicrotask(()=>sheet.dispatchEvent(new window.Event('load')));}});
+  styles.observe(window.document.head,{childList:true});
+  t.after(async()=>{styles.disconnect();getStudySync().destroy();api.close();await window.happyDOM.close();for(const [key,descriptor]of old)descriptor?Object.defineProperty(globalThis,key,descriptor):delete globalThis[key];const part=relative(temporaryRoot,resolve(directory));assert.ok(part.startsWith('kunilingo-shell102-')&&!part.startsWith('..')&&!isAbsolute(part));await rm(directory,{recursive:true,force:true});});
+  const tick=()=>new Promise(resolve=>setTimeout(resolve,5));
+  async function until(predicate){const deadline=Date.now()+5000;while(Date.now()<deadline){if(predicate())return;await tick();}assert.fail('Shell did not reach expected state: '+window.document.querySelector('.beta102-dialog')?.textContent);}
+  await import('./app/ui-study56.js');
+  await until(()=>!root.querySelector('[data-beta-action="account"]').disabled&&root.querySelector('[data-progress-question="B00002"]'));
+  const click=action=>{const target=root.querySelector('[data-beta-action="'+action+'"]');assert.ok(target,action);target.click();};
+  assert.match(root.querySelector('#studyBody').textContent,/Твой прогресс/);
+  click('account');click('switch-auth');
+  const form=root.querySelector('[data-beta-form="auth"]');form.elements.username.value='shell_owner';form.elements.password.value='strong shell password';
+  form.dispatchEvent(new window.Event('submit',{bubbles:true,cancelable:true}));
+  await until(()=>root.querySelector('[data-beta-action="import-guest"]'));
+  assert.equal(root.querySelector('[data-progress-question="B00002"]'),null,'guest was not silently copied');
+  click('import-guest');await until(()=>!root.querySelector('.beta102-dialog').getAttribute('aria-busy')||root.querySelector('.beta102-dialog').getAttribute('aria-busy')==='false');
+  await until(()=>root.querySelector('[data-progress-question="B00002"]'));
+  assert.equal(root.querySelectorAll('.course-notes').length,1);assert.equal(root.querySelectorAll('.practice-rail').length,1);
+  click('close');click('feedback');const message=root.querySelector('textarea[name=message]');message.value='Обнаружена ошибка во время проверки оболочки.';message.dispatchEvent(new window.Event('input',{bubbles:true}));
+  root.querySelector('[data-beta-form="feedback"]').dispatchEvent(new window.Event('submit',{bubbles:true,cancelable:true}));await until(()=>root.textContent.includes('Сообщение принято'));
+  click('close');click('account');click('owner-reports');await until(()=>root.querySelector('.beta102-report-message'));
+  assert.match(root.querySelector('.beta102-report-message').textContent,/Обнаружена ошибка/);
+  click('account');click('logout');await until(()=>root.querySelector('[data-beta-form="auth"]')&&!root.querySelector('[data-beta-action="account"]').disabled);
+  assert.equal(root.querySelector('#beta102-dialog-title').textContent,'Войти');
+  assert.equal(getStudySync().user,null);assert.ok(root.querySelector('[data-progress-question="B00002"]'),'guest work restored on logout');
+  assert.equal(root.querySelectorAll('.course-notes').length,1);assert.equal(root.querySelectorAll('.practice-rail').length,1);
+});

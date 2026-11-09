@@ -1,23 +1,13 @@
-import {sources100,task16Guide100,task16Concepts100} from './study100-task16.js';
+import {task16Concepts100} from './study100-task16.js';
+import {sourceRegistry101,conceptFor101,questionGuide101,lessonConceptIds101} from './study101-registry.js';
 
 export const concepts100=Object.freeze(task16Concepts100.map(concept=>Object.freeze(concept)));
-const conceptMap=new Map(concepts100.map(concept=>[concept.id,concept]));
-export const conceptFor100=id=>conceptMap.get(id)||null;
+export const conceptFor100=conceptFor101;
 export const task16TopicIds100=Object.freeze(concepts100.filter(concept=>concept.id!=='syntax-basis').map(concept=>concept.id));
-export const lessonConceptIds100=Object.freeze({
-  'simple-1':Object.freeze(concepts100.filter(concept=>concept.id==='syntax-basis'||concept.id.startsWith('homogeneous-')).map(concept=>concept.id)),
-  'simple-2':Object.freeze(['syntax-basis','compound-simple','compound-common','compound-special','homogeneous-different-rows'])
-});
+export const lessonConceptIds100=lessonConceptIds101;
 
 export function guideForQuestion100(question){
-  if(Number(question?.task)!==16)return null;
-  // Category membership is the only input to contextual article selection.
-  // Missing categories never mean "show the entire numbered task handbook".
-  const wanted=new Set(Array.isArray(question.tags)?question.tags:[]);
-  const selected=concepts100.filter(concept=>task16TopicIds100.includes(concept.id)&&wanted.has(concept.id));
-  if(!selected.length)return null;
-  const reviewed=question.topicReview?.version===100&&question.topicReview?.status==='reviewed';
-  return {task:16,title:task16Guide100.title,concepts:selected,reviewed};
+  return questionGuide101(question);
 }
 
 const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
@@ -25,7 +15,7 @@ const list=(items,ordered=false)=>items?.length?'<'+(ordered?'ol':'ul')+'>'+item
 const section=(title,body)=>body?'<section><h4>'+title+'</h4>'+body+'</section>':'';
 
 export function sourcesMarkup100(ids){
-  const sources=[...new Set(ids)].map(id=>sources100[id]).filter(Boolean);
+  const sources=[...new Set(ids)].map(id=>sourceRegistry101[id]).filter(Boolean);
   return sources.length?'<details class="study-guide-sources"><summary>Источники</summary><ul>'+sources.map(source=>'<li><a href="'+escape(source.url)+'" target="_blank" rel="noopener noreferrer">'+escape(source.title)+'</a>'+(source.edition?'<small>'+escape(source.edition)+'</small>':'')+'</li>').join('')+'</ul></details>':'';
 }
 

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>KuniLingo · Галерея для дизайнера</title>
+  <link rel="stylesheet" href="./ui-study56.css">
+  <link rel="stylesheet" href="./ui-vellum59.css">
+  <link rel="stylesheet" href="./course78.css">
+  <link rel="stylesheet" href="./practice84.css">
+  <link rel="stylesheet" href="./study-system86.css">
+  <link rel="stylesheet" href="./practice88.css">
+  <link rel="stylesheet" href="./design102.css">
+  <script type="module" src="./design102.js"></script>
+</head>
+<body>
+  <main id="room" class="ui-study vellum-study design102" data-section="practice" data-practice-reveal="ready">
+    <header class="design102-header">
+      <h1>KuniLingo</h1>
+      <p>Галерея компонентов для дизайнера · локальная разработка</p>
+      <p>Компоненты используют действующие стили и обработчики приложения. Учебные образцы не относятся к работе конкретного ученика; данные аккаунтов и обращения здесь не загружаются.</p>
+      <nav aria-label="Разделы галереи">
+        <a href="./?ui=59&amp;style=copper#/russian/path">Путь</a>
+        <a href="./?ui=59&amp;style=copper#/russian/practice">Практика</a>
+        <a href="./?ui=59&amp;style=copper#/russian/progress">Прогресс</a>
+      </nav>
+    </header>
+    <div class="design102-grid">
+      <section class="design102-card" aria-labelledby="design102-records-title" data-design="folders">
+        <h2 id="design102-records-title">Карточки подборки</h2>
+        <p class="design102-caption">Три демонстрационных состояния карточки Р-00002 из открытого банка. Они не отражают прогресс конкретного ученика; их отображает настоящая функция карточки приложения.</p>
+        <div class="practice-question-list" data-design102-records></div>
+      </section>
+      <section class="design102-card" aria-labelledby="design102-controls-title">
+        <h2 id="design102-controls-title">Выбор и форма</h2>
+        <div class="practice-filter-field">
+          <label for="design102-section">Раздел</label>
+          <select id="design102-section" name="section"></select>
+        </div>
+        <details>
+          <summary>Темы и правила</summary>
+          <div class="practice-rule-list">
+            <label class="practice-rule"><input type="checkbox" checked><span>Повторяющиеся союзы</span></label>
+            <label class="practice-rule"><input type="checkbox"><span>Двойные союзы</span></label>
+          </div>
+        </details>
+        <form class="practice-answer" data-design102-answer>
+          <label for="design102-answer">Твой ответ</label>
+          <input id="design102-answer" name="answer" autocomplete="off" inputmode="numeric" aria-describedby="design102-answer-hint design102-answer-status">
+          <p class="practice-answer-hint" id="design102-answer-hint">Учебный образец формы. Отправка и проверка на сервере не выполняются.</p>
+          <button type="submit" class="practice-primary">Показать состояние формы</button>
+          <p class="practice-answer-status" id="design102-answer-status" role="status"></p>
+        </form>
+      </section>
+      <section class="design102-card" aria-labelledby="design102-pencil-title" data-design="folders">
+        <h2 id="design102-pencil-title">Рабочая область и карандаш</h2>
+        <p class="design102-caption">Настоящий модуль карандаша; рисунки этой галереи хранятся только до обновления страницы.</p>
+        <div data-design102-worksheet>
+          <div class="practice-workspace" data-pencil-workspace>
+            <section class="practice-source-content practice-instruction" data-instruction aria-label="Инструкция"><p>Подчеркни связанные члены предложения или сделай любую пометку.</p></section>
+            <section class="practice-source-content practice-material" data-statement aria-label="Материал задания"><p>Мы заметили и следы на снегу, и сломанную ветку.</p></section>
+            <div class="practice-pencil" data-pencil-controls></div>
+          </div>
+        </div>
+      </section>
+      <section class="design102-card" aria-labelledby="design102-handbook-title">
+        <h2 id="design102-handbook-title">Справочник категории</h2>
+        <p class="design102-caption">Настоящая статья из общей базы. Раскрытие и сворачивание выполняет общий компонент.</p>
+        <div data-design102-guide></div>
+      </section>
+      <section class="design102-card" aria-labelledby="design102-states-title">
+        <h2 id="design102-states-title">Загрузка, пусто, ошибка</h2>
+        <div class="practice-loading" role="status">Загружаем задание…</div>
+        <div class="practice-empty"><h3>По этим параметрам заданий нет</h3><p>Измени фильтры справа или выбери другой год.</p></div>
+        <div class="practice-empty"><h3>Задание пока не загрузилось</h3><p>Пример сообщения об ошибке. Повторное действие сохраняет введённый ответ.</p><button type="button" class="practice-primary" data-design102-retry>Повторить</button><p role="status" data-design102-retry-status></p></div>
+        <div class="practice-empty"><h3>Материал ещё готовится</h3><p>У категории есть постоянное место в базе, но полный справочник пока не опубликован.</p></div>
+      </section>
+      <section class="design102-card" aria-labelledby="design102-coverage-title">
+        <h2 id="design102-coverage-title">Состояние содержания</h2>
+        <div data-design102-coverage></div>
+        <div class="practice-filter-field"><label for="design102-category">Категория</label><select id="design102-category" name="category"></select></div>
+        <p role="status" data-design102-category-status></p>
+        <div data-design102-category-preview></div>
+        <details class="design102-json">
+          <summary>Проверка пакета содержания JSON</summary>
+          <p>Служебная проверка структуры и предпросмотр. Она не записывает изменения в приложение и не публикует сайт.</p>
+          <div class="design102-actions"><button type="button" class="practice-secondary" data-design102-export>Скачать текущий пакет</button><button type="button" class="practice-secondary" data-design102-fill>Вставить текущий пакет</button></div>
+          <label class="course-input">JSON<textarea rows="8" data-design102-json aria-label="Пакет содержания JSON" spellcheck="false"></textarea></label>
+          <button type="button" class="practice-primary" data-design102-validate>Проверить и показать</button>
+          <p role="status" data-design102-validation></p>
+        </details>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

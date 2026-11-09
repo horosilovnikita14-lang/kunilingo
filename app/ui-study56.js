@@ -3,6 +3,9 @@ import {PROJECT_NAME, SECTIONS} from './app-sections.js';
 import {attachPathReveal} from './path-reveal77.js';
 import {attachPathExit} from './path-exit80.js';
 import {enhanceControls} from './study-controls86.js';
+import {getStudySync,getStudyStorage} from './beta102-storage.js';
+import {mountBeta102} from './beta102-client.js';
+import {createProgress102} from './progress102.js';
 
 // Opt-in design review. Navigation, camera, audio and writing still belong to the room.
 const style = document.createElement('link');
@@ -69,8 +72,8 @@ reflectMotion();
 new MutationObserver(reflectMotion).observe(get('motionToggle'), {attributes: true, attributeFilter: ['aria-pressed']});
 document.querySelector('.volume-control svg').outerHTML = icon('volume');
 
-// Short, self-contained examples let the layout be judged with Russian copy.
-// This study has no account state. Answers and disclosures live only in the preview.
+// Earlier design variants keep isolated examples. The current ui=59 shell
+// mounts the real Path, Practice, Progress and account controllers below.
 const row = (n, title, meta, state = '') =>
   '<li class="route-row ' + state + '"><span class="node-number">' + (state === 'done' ? icon('check') : n) +
   '</span><span><strong>' + title + '</strong><small>' + meta + '</small></span></li>';
@@ -97,17 +100,29 @@ const screens = {
 const panel = get('studyPanel');
 const body = get('studyBody');
 const heading = get('studyTitle');
-const course = courseModule?.createCourse({body, heading});
-const practice = practiceModule?.createPractice({root,panel,body,heading});
+const sync=vellum?getStudySync():null;
+const storage=vellum?getStudyStorage():globalThis.localStorage;
+let course,practice,beta,identityChanging=false,pendingProgressQuestion=null;
+function mountStudy(){
+  course=courseModule?.createCourse({body,heading,storage});
+  practice=practiceModule?.createPractice({root,panel,body,heading,storage});
+}
+mountStudy();
+const progress=vellum?createProgress102({body,heading,storage,subscribe:listener=>sync.subscribe(event=>{if(['write','replace','identity'].includes(event.reason))listener(event);}),onNavigate(section,options={}){
+  pendingProgressQuestion=options.questionId||null;
+  tabs.find(button=>button.dataset.section===section)?.click();
+}}):null;
 heading.insertAdjacentHTML('afterend', '<div class="chapter-plate" aria-hidden="true"><span></span></div>');
 const plate = panel.querySelector('.chapter-plate');
 let drawnSection=null;
 function drawSection() {
+  if(identityChanging)return;
   const section = root.dataset.section;
   if(section===drawnSection)return;
   drawnSection=section;
   if(course&&section!=='path')course.leave();
   if(practice&&section!=='practice')practice.leave();
+  if(progress&&section!=='progress')progress.leave();
   if (!Object.hasOwn(screens, section)) return;
   const index = number(sectionOrder.indexOf(section) + 1);
   plate.innerHTML = icon(section) + '<span>РАЗДЕЛ ' + index + ' / 03</span>';
@@ -116,7 +131,8 @@ function drawSection() {
     course.showMap();
     return;
   }
-  if (practice && section === 'practice') {practice.show();return;}
+  if (practice && section === 'practice') {const question=pendingProgressQuestion;pendingProgressQuestion=null;question?practice.open(question):practice.show();return;}
+  if (progress && section === 'progress') {progress.show();return;}
   body.innerHTML = vellum && section === 'practice' ? vellum.practice : screens[section];
   if(vellum)enhanceControls(body);
   if (section === 'path') body.querySelector('[data-start]').addEventListener('click', () => {
@@ -144,11 +160,22 @@ if (vellum) {
   // Append synchronously in the established cascade order, then await all files.
   // The rails remain concealed until every stylesheet is ready.
   const sectionStyles=[course.mountStyles(),practice.mountStyles()];
-  const sharedStyles=['./study-system86.css','./practice88.css'].map(href=>new Promise(resolve=>{const sheet=document.createElement('link');sheet.rel='stylesheet';sheet.href=href;sheet.onload=sheet.onerror=resolve;document.head.append(sheet);}));
+  const sharedStyles=['./study-system86.css','./practice88.css','./progress102.css','./beta102.css'].map(href=>new Promise(resolve=>{const sheet=document.createElement('link');sheet.rel='stylesheet';sheet.href=href;sheet.onload=sheet.onerror=resolve;document.head.append(sheet);}));
   await Promise.all([...sectionStyles,...sharedStyles]);
   railStyleGuard?.remove();
   get('studyPanel').style.removeProperty('visibility');
   pathReveal.ready();
+  beta=mountBeta102({root,dock:review,getContext(){
+    const section=root.dataset.section;
+    return {...(section==='path'?course.getContext():section==='practice'?practice.getContext():{section:section==='progress'?'progress':'general'}),version:'local-102'};
+  },async onIdentityChange({phase}){
+    if(phase==='before'){
+      identityChanging=true;progress.leave();course.destroy();practice.destroy();panel.inert=true;
+    }else{
+      mountStudy();identityChanging=false;panel.inert=false;drawnSection=null;drawSection();
+    }
+  }});
+  globalThis.addEventListener('pagehide',()=>beta.flush());
   if (query.get('style') !== 'copper') {
     const url = new URL(location.href);
     url.searchParams.set('style', 'copper');

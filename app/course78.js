@@ -13,11 +13,13 @@ const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<'
 const lessonById=id=>lessons.find(lesson=>lesson.id===id);
 const unitFor=id=>course.find(unit=>unit.lessons.some(lesson=>lesson.id===id));
 
-export function createCourse({body,heading}) {
+export function createCourse({body,heading,storage=globalThis.localStorage}) {
+  const listeners=new AbortController();let destroyed=false;
+  const listen=(target,type,handler)=>target?.addEventListener?.(type,handler,{signal:listeners.signal});
   let saved={},legacy=false;
   try {
-    const current=localStorage.getItem(storageKey);
-    saved=JSON.parse(current||localStorage.getItem('kunilingo.russian.course73')||'{}');
+    const current=storage.getItem(storageKey);
+    saved=JSON.parse(current||storage.getItem('kunilingo.russian.course73')||'{}');
     legacy=!current;
   } catch {}
   const state=createState(saved,legacy);
@@ -50,8 +52,9 @@ export function createCourse({body,heading}) {
     }
   }
   function save() {
+    if(destroyed)return;
     rememberWork();
-    try {localStorage.setItem(storageKey,JSON.stringify(state));storageFailed=false;} catch {storageFailed=true;}
+    try {storage.setItem(storageKey,JSON.stringify(state));storageFailed=false;} catch {storageFailed=true;}
   }
   function cancelTransient() {
     clearTimeout(archiveTimer);clearTimeout(openingTimer);clearTimeout(closingTimer);
@@ -248,7 +251,7 @@ export function createCourse({body,heading}) {
   }
   function showMap(focus=false) {save();cancelTransient();screen={kind:'route'};noteReturn=null;flash=null;render(focus);if(focus)panel.classList.add('course-map-return');}
   function leave() {save();cancelTransient();}
-  root.addEventListener('study-exit',leave);
+  listen(root,'study-exit',leave);
   function act(event) {
     const control=event.target.closest('[data-course],[data-course-lesson],[data-course-practice],[data-course-control]');
     if (!control||control.disabled||archiving||closingTimer!==null) return;
@@ -305,8 +308,8 @@ export function createCourse({body,heading}) {
     } else return;
     save();render(true);
   }
-  body.addEventListener('click',act);
-  notes.addEventListener('click',event=>{
+  listen(body,'click',act);
+  listen(notes,'click',event=>{
     if(archiving||closingTimer!==null) return;
     const toggle=event.target.closest('.course-notes-toggle');
     if(toggle) {
@@ -317,7 +320,7 @@ export function createCourse({body,heading}) {
     const item=event.target.closest('[data-note]');
     if(item) openNote(item.dataset.note);
   });
-  body.addEventListener('submit',event=>{
+  listen(body,'submit',event=>{
     const form=event.target,type=form.dataset.courseForm;
     if(!type) return;
     event.preventDefault();
@@ -360,9 +363,9 @@ export function createCourse({body,heading}) {
     else return;
     save();
   }
-  body.addEventListener('input',rememberInput);body.addEventListener('change',rememberInput);
-  globalThis.addEventListener?.('pagehide',save);
-  return {render,showMap,leave,mountStyles() {
+  listen(body,'input',rememberInput);listen(body,'change',rememberInput);
+  listen(globalThis,'pagehide',save);
+  return {render,showMap,leave,getContext(){return {section:'path',...(screen.lessonId?{lessonId:screen.lessonId}:{})};},destroy(){if(destroyed)return;leave();destroyed=true;listeners.abort();notes.remove();},mountStyles() {
     return Promise.all(['./path-workspace71.css','./route-map72.css','./course73.css','./course74-map.css','./course78.css','./course79.css','./course80.css','./course81.css'].map(href=>new Promise(resolve=>{
       const sheet=document.createElement('link');sheet.rel='stylesheet';sheet.href=href;sheet.onload=sheet.onerror=resolve;document.head.append(sheet);
     })));
